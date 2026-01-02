@@ -384,3 +384,227 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+// import 'package:flutter/material.dart';
+// import 'package:laptop_harbor/auth/register_page.dart';
+
+// class LoginPage extends StatefulWidget {
+//   const LoginPage({super.key});
+
+//   @override
+//   State<LoginPage> createState() => _LoginPageState();
+// }
+
+// class _LoginPageState extends State<LoginPage> {
+//   bool _obscurePassword = true;
+//   final _emailController = TextEditingController();
+//   final _passwordController = TextEditingController();
+
+//   @override
+//   void dispose() {
+//     _emailController.dispose();
+//     _passwordController.dispose();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+
+//       // ✅ BACK BUTTON ADDED
+//       appBar: AppBar(
+//         backgroundColor: Colors.white,
+//         elevation: 0,
+//         leading: IconButton(
+//           icon: const Icon(Icons.arrow_back, color: Colors.black),
+//           onPressed: () => Navigator.pop(context),
+//         ),
+//       ),
+
+//       body: SafeArea(
+//         child: SingleChildScrollView(
+//           padding: const EdgeInsets.all(30),
+//           child: Column(
+//             children: [
+//               const SizedBox(height: 30),
+//               _buildHeader(),
+//               const SizedBox(height: 50),
+//               _buildLoginForm(),
+//               const SizedBox(height: 30),
+//               _buildSocialLogin(),
+//               const SizedBox(height: 30),
+//               _buildRegisterLink(),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   // ================= UI METHODS SAME =================
+
+//   Widget _buildHeader() {
+//     return TweenAnimationBuilder(
+//       tween: Tween<double>(begin: 0, end: 1),
+//       duration: const Duration(milliseconds: 1000),
+//       curve: Curves.easeOutBack,
+//       builder: (context, double value, child) {
+//         return Opacity(
+//           opacity: value.clamp(0.0, 1.0),
+//           child: Transform.scale(
+//             scale: value,
+//             child: Column(
+//               children: [
+//                 Row(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     const Text(
+//                       'Laptop',
+//                       style: TextStyle(
+//                         fontSize: 38,
+//                         fontWeight: FontWeight.w900,
+//                         color: Colors.black,
+//                       ),
+//                     ),
+//                     Text(
+//                       'Harbore',
+//                       style: TextStyle(
+//                         fontSize: 38,
+//                         fontWeight: FontWeight.w900,
+//                         color: Colors.red.shade600,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//                 const SizedBox(height: 8),
+//                 Text(
+//                   'Welcome Back!',
+//                   style: TextStyle(
+//                     fontSize: 16,
+//                     color: Colors.grey.shade600,
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         );
+//       },
+//     );
+//   }
+
+//   Widget _buildLoginForm() {
+//     return Column(
+//       children: [
+//         _buildTextField(
+//           controller: _emailController,
+//           label: 'Email',
+//           icon: Icons.email_outlined,
+//           keyboardType: TextInputType.emailAddress,
+//         ),
+//         const SizedBox(height: 16),
+//         _buildTextField(
+//           controller: _passwordController,
+//           label: 'Password',
+//           icon: Icons.lock_outline,
+//           isPassword: true,
+//           obscureText: _obscurePassword,
+//           onTogglePassword: () {
+//             setState(() {
+//               _obscurePassword = !_obscurePassword;
+//             });
+//           },
+//         ),
+//         const SizedBox(height: 24),
+//         _buildActionButton(
+//           label: 'Login',
+//           onPressed: () {
+//             ScaffoldMessenger.of(context).showSnackBar(
+//               SnackBar(
+//                 content: const Text('Login successful!'),
+//                 backgroundColor: Colors.red.shade600,
+//               ),
+//             );
+//           },
+//         ),
+//       ],
+//     );
+//   }
+
+//   Widget _buildRegisterLink() {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       children: [
+//         Text("Don't have an account? ",
+//             style: TextStyle(color: Colors.grey.shade600)),
+//         TextButton(
+//           onPressed: () {
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (_) => const RegisterPage()),
+//             );
+//           },
+//           child: Text(
+//             'Register',
+//             style: TextStyle(
+//               color: Colors.red.shade600,
+//               fontWeight: FontWeight.w600,
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+
+//   // ================= REUSABLE WIDGETS =================
+
+//   Widget _buildTextField({
+//     required TextEditingController controller,
+//     required String label,
+//     required IconData icon,
+//     bool isPassword = false,
+//     bool obscureText = false,
+//     VoidCallback? onTogglePassword,
+//     TextInputType? keyboardType,
+//   }) {
+//     return TextField(
+//       controller: controller,
+//       obscureText: isPassword ? obscureText : false,
+//       keyboardType: keyboardType,
+//       decoration: InputDecoration(
+//         labelText: label,
+//         prefixIcon: Icon(icon),
+//         suffixIcon: isPassword
+//             ? IconButton(
+//                 icon: Icon(
+//                     obscureText ? Icons.visibility_off : Icons.visibility),
+//                 onPressed: onTogglePassword,
+//               )
+//             : null,
+//         border: OutlineInputBorder(
+//           borderRadius: BorderRadius.circular(12),
+//         ),
+//       ),
+//     );
+//   }
+
+//   Widget _buildActionButton({
+//     required String label,
+//     required VoidCallback onPressed,
+//   }) {
+//     return SizedBox(
+//       width: double.infinity,
+//       height: 52,
+//       child: ElevatedButton(
+//         style: ElevatedButton.styleFrom(
+//           backgroundColor: Colors.red.shade600,
+//           shape:
+//               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+//         ),
+//         onPressed: onPressed,
+//         child: Text(label),
+//       ),
+//     );
+//   }
+
+//   Widget _buildSocialLogin() => const SizedBox(); // unchanged
+// }
