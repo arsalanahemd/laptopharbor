@@ -235,7 +235,7 @@ class _FilterDialogState extends State<FilterDialog>
         height: MediaQuery.of(context).size.height * 0.8,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          color: Colors.white,
+          color: const Color.fromRGBO(255, 255, 255, 1),
         ),
         child: Column(
           children: [
@@ -243,7 +243,7 @@ class _FilterDialogState extends State<FilterDialog>
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.red,
+                color: const Color.fromARGB(255, 54, 117, 244),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
@@ -274,9 +274,9 @@ class _FilterDialogState extends State<FilterDialog>
               child: TabBar(
                 controller: _tabController,
                 isScrollable: true,
-                labelColor: Colors.red,
+                labelColor: const Color.fromARGB(255, 54, 117, 244),
                 unselectedLabelColor: Colors.grey[600],
-                indicatorColor: Colors.red,
+                indicatorColor:const Color.fromARGB(255, 54, 117, 244),
                 indicatorWeight: 3,
                 tabs: const [
                   Tab(text: 'Price'),
@@ -339,7 +339,7 @@ class _FilterDialogState extends State<FilterDialog>
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
+                        backgroundColor: Color.fromARGB(255, 54, 117, 244),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -389,7 +389,7 @@ class _FilterDialogState extends State<FilterDialog>
             min: 0,
             max: 500000,
             divisions: 50,
-            activeColor: Colors.red,
+            activeColor: Color.fromARGB(255, 54, 117, 244),
             inactiveColor: Colors.red[100],
             labels: RangeLabels(
               'Rs ${_filters.priceRange.start.round()}',
@@ -430,7 +430,7 @@ class _FilterDialogState extends State<FilterDialog>
             });
           },
           style: OutlinedButton.styleFrom(
-            side: BorderSide(color: Colors.red[300]!),
+            side: BorderSide(color: Color.fromARGB(255, 54, 117, 244)),
           ),
           child: Text(range['label'] as String),
         );
@@ -446,7 +446,7 @@ class _FilterDialogState extends State<FilterDialog>
         return CheckboxListTile(
           title: Text(brand),
           value: isSelected,
-          activeColor: Colors.red,
+          activeColor: Color.fromARGB(255, 54, 117, 244),
           onChanged: (bool? value) {
             setState(() {
               if (value == true) {
@@ -469,7 +469,7 @@ class _FilterDialogState extends State<FilterDialog>
         return CheckboxListTile(
           title: Text(processor),
           value: isSelected,
-          activeColor: Colors.red,
+          activeColor: Color.fromARGB(255, 54, 117, 244),
           onChanged: (bool? value) {
             setState(() {
               if (value == true) {
@@ -492,7 +492,7 @@ class _FilterDialogState extends State<FilterDialog>
         return CheckboxListTile(
           title: Text('$ram GB'),
           value: isSelected,
-          activeColor: Colors.red,
+          activeColor: Color.fromARGB(255, 54, 117, 244),
           onChanged: (bool? value) {
             setState(() {
               if (value == true) {
@@ -515,7 +515,7 @@ class _FilterDialogState extends State<FilterDialog>
         return CheckboxListTile(
           title: Text('$storage GB'),
           value: isSelected,
-          activeColor: Colors.red,
+          activeColor: Color.fromARGB(255, 54, 117, 244),
           onChanged: (bool? value) {
             setState(() {
               if (value == true) {

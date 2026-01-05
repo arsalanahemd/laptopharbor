@@ -1,69 +1,151 @@
 import 'package:flutter/material.dart';
-import '../widgets/filter_dialog.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isSearchOpen;
-  final TextEditingController controller;
-  final VoidCallback onSearchToggle;
+  final TextEditingController searchController;
   final ValueChanged<String> onSearchChanged;
-  final VoidCallback onFilterTap;
-  final bool hasActiveFilters;
+  final VoidCallback onSearchToggle;
+  final VoidCallback onFilterClick;
+  final VoidCallback onMenuClick;
+  final VoidCallback onCartClick;
+  final String title;
+  final String subtitle;
+  final int cartCount;
 
   const CustomAppBar({
     super.key,
     required this.isSearchOpen,
-    required this.controller,
-    required this.onSearchToggle,
+    required this.searchController,
     required this.onSearchChanged,
-    required this.onFilterTap,
-    required this.hasActiveFilters,
+    required this.onSearchToggle,
+    required this.onFilterClick,
+    required this.onMenuClick,
+    required this.onCartClick,
+    this.title = 'Laptop Harbor',
+    this.subtitle = 'Premium Laptops',
+    this.cartCount = 0, required Null Function() onNotificationClick, required Null Function() onSearchClick, required Null Function() onClose,
   });
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      title: isSearchOpen
-          ? TextField(
-              controller: controller,
-              autofocus: true,
-              onChanged: onSearchChanged,
-              decoration: const InputDecoration(
-                hintText: 'Search laptops...',
-                border: InputBorder.none,
-              ),
-            )
-          : const Text('Laptop Harbor',
-              style: TextStyle(fontWeight: FontWeight.bold)),
-      backgroundColor: Colors.white,
-      foregroundColor: Colors.black,
-      elevation: 0,
-      actions: [
-        IconButton(
-          icon: Icon(isSearchOpen ? Icons.close : Icons.search),
-          onPressed: onSearchToggle,
-        ),
-        Stack(
+    return Container(
+      color: const Color(0xFF1E293B),
+      padding: const EdgeInsets.all(16),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(
-              icon: const Icon(Icons.filter_list),
-              onPressed: onFilterTap,
+            /// 🔹 TOP BAR
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: onMenuClick,
+                  icon: const Icon(Icons.menu, color: Colors.white),
+                ),
+
+                Column(
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+
+                Stack(
+                  children: [
+                    IconButton(
+                      onPressed: onCartClick,
+                      icon: const Icon(Icons.shopping_cart, color: Colors.white),
+                    ),
+                    if (cartCount > 0)
+                      Positioned(
+                        right: 4,
+                        top: 4,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            '$cartCount',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
             ),
-            if (hasActiveFilters)
-              const Positioned(
-                right: 8,
-                top: 8,
-                child: CircleAvatar(radius: 4, backgroundColor: Colors.red),
-              ),
+
+            const SizedBox(height: 12),
+
+            /// 🔍 SEARCH BAR
+            Row(
+              children: [
+                Expanded(
+                  child: isSearchOpen
+                      ? TextField(
+                          controller: searchController,
+                          autofocus: true,
+                          onChanged: onSearchChanged,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: const InputDecoration(
+                            hintText: 'Search laptops...',
+                            hintStyle: TextStyle(color: Colors.white54),
+                            border: InputBorder.none,
+                          ),
+                        )
+                      : InkWell(
+                          onTap: onSearchToggle,
+                          child: Row(
+                            children: const [
+                              Icon(Icons.search, color: Colors.white70),
+                              SizedBox(width: 8),
+                              Text(
+                                'Search laptops...',
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                            ],
+                          ),
+                        ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: onFilterClick,
+                  icon: const Icon(Icons.tune, color: Colors.white),
+                ),
+                if (isSearchOpen)
+                  IconButton(
+                    onPressed: onSearchToggle,
+                    icon: const Icon(Icons.close, color: Colors.white),
+                  ),
+              ],
+            ),
           ],
         ),
-        IconButton(
-          icon: const Icon(Icons.shopping_cart_outlined),
-          onPressed: () {},
-        ),
-      ],
+      ),
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize =>
+      Size.fromHeight(isSearchOpen ? 140 : 120);
 }

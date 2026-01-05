@@ -1,353 +1,383 @@
+
 import 'package:flutter/material.dart';
 
-class AppDrawer extends StatefulWidget {
-  const AppDrawer({super.key});
+class AppDrawer extends StatelessWidget {
+  final VoidCallback onClose;
+  final Map<String, String>? profile;
 
-  @override
-  State<AppDrawer> createState() => _AppDrawerState();
-}
+  const AppDrawer({
+    super.key,
+    required this.onClose,
+    this.profile,
+  });
 
-class _AppDrawerState extends State<AppDrawer>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-
-  int _selectedIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOut,
-      ),
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(-0.3, 0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOutCubic,
-      ),
-    );
-
-    _animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  Widget _buildDrawerItem({
-    required IconData icon,
-    required String title,
-    required int index,
-    required VoidCallback onTap,
-  }) {
-    final isSelected = _selectedIndex == index;
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.red.withOpacity(0.1) : Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: isSelected ? Colors.red : Colors.grey[700],
-          size: 26,
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            color: isSelected ? Colors.red : Colors.grey[800],
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            fontSize: 16,
-          ),
-        ),
-        onTap: () {
-          setState(() {
-            _selectedIndex = index;
-          });
-          onTap();
-        },
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-    );
+  void handleMenuClick(String label) {
+    print('Clicked: $label');
+    // Add your navigation logic here
   }
 
   @override
   Widget build(BuildContext context) {
+    final menuItems = [
+      {'icon': Icons.home, 'label': 'Home', 'color': Colors.grey[700]},
+      {'icon': Icons.laptop, 'label': 'All Laptops', 'color': Colors.grey[700]},
+      // {'icon': Icons.monitor, 'label': 'Brands', 'color': Colors.grey[700]},
+      // {'icon': Icons.inventory_2, 'label': 'Accessories', 'color': Colors.grey[700]},
+      // {'icon': Icons.local_offer, 'label': 'Deals & Offers', 'color': Colors.grey[700], 'badge': 'Hot'},
+      // {'icon': Icons.sports_esports, 'label': 'Gaming Laptops', 'color': Colors.grey[700]},
+      // {'icon': Icons.business_center, 'label': 'Business Laptops', 'color': Colors.grey[700]},
+      {'icon': Icons.favorite, 'label': 'Favorites', 'color': Colors.grey[700]},
+      {'icon': Icons.settings, 'label': 'My Account', 'color': Colors.blue[600], 'active': true},
+      {'icon': Icons.help_outline, 'label': "FAQ's", 'color': Colors.grey[700]},
+      {'icon': Icons.phone, 'label': 'Contact Us', 'color': Colors.grey[700]},
+      // {'icon': Icons.public, 'label': 'Region', 'color': Colors.grey[700]},
+    ];
+
     return Drawer(
-      child: FadeTransition(
-        opacity: _fadeAnimation,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white,
-                Colors.grey[50]!,
-              ],
-            ),
-          ),
-          child: Column(
-            children: [
-              // HEADER
-              SlideTransition(
-                position: _slideAnimation,
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(24, 60, 24, 24),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.red,
-                        Colors.red[700]!,
+      width: 320,
+      child: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            // Header - Profile Section
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.grey[50]!, Colors.blue[50]!],
+                ),
+                border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFF60A5FA), Color(0xFF4F46E5)],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image.network(
+                        profile?['avatar'] ?? 'https://api.dicebear.com/7.x/avataaars/svg?seed=User',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.person, color: Colors.white, size: 32);
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          profile?['name'] ?? 'Guest User',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1F2937),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          profile?['title'] ?? 'User',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  IconButton(
+                    onPressed: onClose,
+                    icon: Icon(Icons.close, color: Colors.grey[600]),
+                    splashRadius: 20,
+                  ),
+                ],
+              ),
+            ),
+
+            // Logo Section
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [Color(0xFF1E293B), Color(0xFF1E3A8A)],
+                ),
+                border: Border(bottom: BorderSide(color: Color(0xFF334155))),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children: [
                       Container(
-                        width: 70,
-                        height: 70,
+                        width: 40,
+                        height: 40,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
-                        child: const Icon(
-                          Icons.laptop_mac,
-                          color: Colors.red,
-                          size: 40,
-                        ),
+                        child: const Icon(Icons.laptop, color: Color(0xFF2563EB), size: 24),
                       ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Laptop Harbor',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Your Tech Paradise',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 14,
-                        ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            'LAPTOP',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              height: 1.2,
+                            ),
+                          ),
+                          Text(
+                            'HARBOR',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF93C5FD),
+                              height: 1.2,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              // MENU ITEMS
-              Expanded(
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    children: [
-                      _buildDrawerItem(
-                        icon: Icons.home_rounded,
-                        title: 'Home',
-                        index: 0,
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.pushReplacementNamed(context, '/');
-                        },
-                      ),
-                      _buildDrawerItem(
-                        icon: Icons.info_rounded,
-                        title: 'About',
-                        index: 1,
-                        onTap: () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('About page coming soon!'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildDrawerItem(
-                        icon: Icons.contact_page_rounded,
-                        title: 'Contact',
-                        index: 2,
-                        onTap: () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Contact page coming soon!'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildDrawerItem(
-                        icon: Icons.category_rounded,
-                        title: 'Categories',
-                        index: 3,
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.pushNamed(context, '/categories');
-                        },
-                      ),
-                      _buildDrawerItem(
-                        icon: Icons.filter_alt_rounded,
-                        title: 'Filter',
-                        index: 4,
-                        onTap: () {
-                          Navigator.pop(context);
-                          _showFilterDialog(context);
-                        },
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                        child: Divider(),
-                      ),
-                      _buildDrawerItem(
-                        icon: Icons.favorite_rounded,
-                        title: 'Favorites',
-                        index: 5,
-                        onTap: () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Favorites page coming soon!'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildDrawerItem(
-                        icon: Icons.shopping_cart_rounded,
-                        title: 'Cart',
-                        index: 6,
-                        onTap: () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Cart page coming soon!'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildDrawerItem(
-                        icon: Icons.settings_rounded,
-                        title: 'Settings',
-                        index: 7,
-                        onTap: () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Settings page coming soon!'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // FOOTER
-              SlideTransition(
-                position: _slideAnimation,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    'Version 1.0.0',
+                  const Text(
+                    'v1.0',
                     style: TextStyle(
-                      color: Colors.grey[600],
                       fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF93C5FD),
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+
+            // Menu Items
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: menuItems.length,
+                itemBuilder: (context, index) {
+                  final item = menuItems[index];
+                  final isActive = item['active'] == true;
+                  final color = item['color'] as Color? ?? Colors.grey[700]!;
+
+                  return InkWell(
+                    onTap: () => handleMenuClick(item['label'] as String),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: isActive ? Colors.blue[50] : null,
+                        border: isActive
+                            ? const Border(left: BorderSide(color: Color(0xFF2563EB), width: 4))
+                            : null,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            item['icon'] as IconData,
+                            size: 20,
+                            color: isActive ? Colors.blue[600] : color,
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              item['label'] as String,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: isActive ? Colors.blue[600] : const Color(0xFF374151),
+                              ),
+                            ),
+                          ),
+                          if (item['badge'] != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFF97316), Color(0xFFEF4444)],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                item['badge'] as String,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // Footer
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                border: Border(top: BorderSide(color: Colors.grey[200]!)),
+              ),
+              child: Column(
+                children: [
+                  // Settings & Logout
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap: () => handleMenuClick('Settings'),
+                          child: Row(
+                            children: [
+                              Icon(Icons.settings, size: 20, color: Colors.grey[700]),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Settings',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text('|', style: TextStyle(color: Colors.grey[300])),
+                        InkWell(
+                          onTap: () => handleMenuClick('Logout'),
+                          child: const Text(
+                            'Logout',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF374151),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Region Selector
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      border: Border(top: BorderSide(color: Colors.grey[200]!)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.public, size: 20, color: Colors.grey[600]),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Region',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        const Spacer(),
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue[100],
+                            foregroundColor: Colors.blue[700],
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            minimumSize: const Size(0, 28),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            'USA',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey[100],
+                            foregroundColor: Colors.grey[700],
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            minimumSize: const Size(0, 28),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            'PK',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
-
-  void _showFilterDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Filter Options'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.attach_money),
-                title: const Text('Price Range'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.memory),
-                title: const Text('RAM'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.storage),
-                title: const Text('Storage'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 }
+
+// Usage Example:
+// Scaffold(
+//   appBar: AppBar(title: Text('Laptop Harbor')),
+//   drawer: AppDrawer(
+//     onClose: () => Navigator.of(context).pop(),
+//     profile: {
+//       'name': 'John Doe',
+//       'title': 'Premium Member',
+//       'avatar': 'https://example.com/avatar.jpg',
+//     },
+//   ),
+//   body: Center(child: Text('Main Content')),
+// );

@@ -801,7 +801,7 @@ class LaptopHarborApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFFF5F7FA),
         fontFamily: 'SF Pro',
       ),
-      home: const LaptopHomePage(),
+      home: const LaptopHomePage (),
       routes: {
         '/categories': (context) => CategoriesPage(),
       },
