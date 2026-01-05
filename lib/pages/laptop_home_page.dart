@@ -15,6 +15,7 @@ import 'package:laptop_harbor/widgets/app_drawer.dart';
 import 'package:laptop_harbor/widgets/custom_app_bar.dart';
 import 'package:laptop_harbor/widgets/custom_bottom_nav.dart';
 import 'package:laptop_harbor/widgets/filter_dialog.dart';
+import 'package:laptop_harbor/widgets/hero_section.dart';
 import 'package:laptop_harbor/widgets/laptop_card.dart';
 
 class LaptopHomePage extends StatefulWidget {
@@ -154,6 +155,7 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
               onMenuClick: () =>
                   _scaffoldKey.currentState?.openDrawer(),
               onCartClick: () {},
+              
               cartCount: 3, onNotificationClick: () {  }, onSearchClick: () {  }, onClose: () {  },
             ),
 
@@ -168,8 +170,8 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
                 const CategoriesPage(),
                 const OrderPage(),
                 const WishlistPage(),
-                const AdminDashboard(),
-                // const ProfilePage(),
+                // const AdminDashboard(),
+                const ProfilePage(),
               ],
             ),
           ),
@@ -208,7 +210,8 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          _hero(),
+          // _hero(),
+          const HeroSection(),
           _section('🔥 Hot Deals', _hotDeals()),
           _section('✨ New Arrivals', _newArrivals()),
           _section('💰 Most Sale', _mostSale()),

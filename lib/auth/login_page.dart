@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:laptop_harbor/auth/register_page.dart';
+import 'package:laptop_harbor/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -24,21 +25,51 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
-    if (_formKey.currentState!.validate()) {
-      // Handle login logic here
-      print('Email: ${_emailController.text}');
-      print('Password: ${_passwordController.text}');
-      print('Remember Me: $_rememberMe');
+  // void _handleLogin() {
+  //   if (_formKey.currentState!.validate()) {
+  //     // Handle login logic here
+  //     print('Email: ${_emailController.text}');
+  //     print('Password: ${_passwordController.text}');
+  //     print('Remember Me: $_rememberMe');
       
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Login Successful!'),
+  //         backgroundColor: Colors.green,
+  //       ),
+  //     );
+  //   }
+  // }
+
+  void _handleLogin() async {
+  if (_formKey.currentState!.validate()) {
+    try {
+      final user = await AuthService().login(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
+
+      if (user != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login Successful'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // ❌ Navigation ki zarurat nahi
+        // Wrapper khud Home pe le jayega
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Login Successful!'),
-          backgroundColor: Colors.green,
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
         ),
       );
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -491,3 +522,5 @@ class RegisterScreen extends StatelessWidget {
     );
   }
 }
+
+

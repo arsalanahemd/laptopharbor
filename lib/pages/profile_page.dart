@@ -5,6 +5,7 @@ import 'package:laptop_harbor/pages/orders_page.dart';
 import 'package:laptop_harbor/pages/payment_methods.dart';
 import 'package:laptop_harbor/pages/shipping_address.dart';
 import 'package:laptop_harbor/pages/wishlist_page.dart';
+import 'package:laptop_harbor/services/auth_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -490,7 +491,7 @@ class _ProfilePageState extends State<ProfilePage> {
           color: Colors.grey[800],
         ),
       ),
-      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: const Color.fromARGB(255, 255, 255, 255)),
     );
   }
 
@@ -510,8 +511,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Text('Cancel'),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
+                  onPressed: () async {
+                    // Navigator.pop(context);
+                     await AuthService().logout();
                     // Perform logout
                   },
                   style: ElevatedButton.styleFrom(
@@ -526,8 +528,8 @@ class _ProfilePageState extends State<ProfilePage> {
         icon: Icon(Icons.logout),
         label: Text('Logout'),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.red[50],
-          foregroundColor: Colors.red[700],
+          backgroundColor: const Color.fromARGB(255, 63, 123, 250),
+          foregroundColor: const Color.fromARGB(255, 255, 255, 255),
           padding: EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

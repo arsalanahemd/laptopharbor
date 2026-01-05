@@ -778,16 +778,22 @@
 //     super.dispose();
 //   }
 // }
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:laptop_harbor/models/laptop_model.dart';
-import 'package:laptop_harbor/pages/CategoriesPage.dart';
-import 'package:laptop_harbor/pages/laptop_home_page.dart';
-import 'package:laptop_harbor/pages/laptop_detail_screen.dart';
+import 'package:laptop_harbor/firebase_options.dart';
+// import 'package:laptop_harbor/models/laptop_model.dart';
+// import 'package:laptop_harbor/pages/CategoriesPage.dart';
+// import 'package:laptop_harbor/pages/laptop_home_page.dart';
+// import 'package:laptop_harbor/pages/laptop_detail_screen.dart';
+import 'package:laptop_harbor/services/wrapper.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const LaptopHarborApp());
 }
-
 class LaptopHarborApp extends StatelessWidget {
   const LaptopHarborApp({super.key});
 
@@ -801,19 +807,17 @@ class LaptopHarborApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFFF5F7FA),
         fontFamily: 'SF Pro',
       ),
-      home: const LaptopHomePage (),
-      routes: {
-        '/categories': (context) => CategoriesPage(),
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == '/details') {
-          final laptop = settings.arguments as LaptopModel;
-          return MaterialPageRoute(
-            builder: (_) => LaptopDetailScreen(laptop: laptop),
-          );
-        }
-        return null;
-      },
+      home: const AuthWrapper(),
+      // routes: {'/categories': (context) => CategoriesPage()},
+      // onGenerateRoute: (settings) {
+        // if (settings.name == '/details') {
+          // final laptop = settings.arguments as LaptopModel;
+          // return MaterialPageRoute(
+            // builder: (_) => LaptopDetailScreen(laptop: laptop),
+          // );
+        // }
+        // return null;
+      // },
     );
   }
 }

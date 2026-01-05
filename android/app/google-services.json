@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "92233708432",
+    "project_id": "laptopharbor-1fbf1",
+    "storage_bucket": "laptopharbor-1fbf1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:92233708432:android:d4a54a7e8c69411b133915",
+        "android_client_info": {
+          "package_name": "com.example.laptop_harbor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjrYSx-sotCxQTzQ-8o_O9y_We3VJjXj0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

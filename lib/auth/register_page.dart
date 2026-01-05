@@ -1,4 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:laptop_harbor/services/auth_service.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -29,32 +32,45 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  void _register() {
-    if (_formKey.currentState!.validate()) {
-      if (!_acceptTerms) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Please accept Terms & Conditions'),
-            backgroundColor: Colors.red[700],
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-        return;
-      }
-
-      // Registration logic here
+  void _register() async {
+  if (_formKey.currentState!.validate()) {
+    if (!_acceptTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Account created successfully!'),
-          backgroundColor: Colors.green[700],
-          behavior: SnackBarBehavior.floating,
+          content: const Text('Please accept Terms & Conditions'),
+          backgroundColor: Colors.red[700],
         ),
       );
+      return;
+    }
 
-      // Navigate to login or home
-      Navigator.pop(context);
+    try {
+      final user = await AuthService().register(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
+
+      if (user != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Account created successfully'),
+            backgroundColor: Colors.green[700],
+          ),
+        );
+
+        Navigator.pop(context); // back to login
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
