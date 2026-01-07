@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:laptop_harbor/models/laptop_model.dart';
+// import 'package:laptop_harbor/providers/wishlist_provider.dart';
+// import '../models/wishlist_model.dart';
+import 'package:provider/provider.dart';
+import 'package:laptop_harbor/providers/cart_provider.dart';
+
 
 class LaptopCard extends StatefulWidget {
   final LaptopModel laptop;
@@ -158,9 +163,11 @@ class _LaptopCardState extends State<LaptopCard> {
                                 
                                 // Favorite Button
                                 GestureDetector(
-                                  onTap: () {
-                                    setState(() => isFavorite = !isFavorite);
-                                    widget.onFavorite?.call();
+                                  onTap: ()async {
+                                   
+                                      // await WishlistProvider.toggleWishlist(WishlistModel as WishlistModel);
+                                    // setState(() => isFavorite = !isFavorite);
+                                    // widget.onFavorite?.call();
                                   },
                                   child: Container(
                                     padding: EdgeInsets.all(isTiny ? 4 : isSmall ? 5 : 6),
@@ -368,7 +375,18 @@ class _LaptopCardState extends State<LaptopCard> {
                                   ],
                                 ),
                               ),
-                              Container(
+                              GestureDetector(
+  onTap: () {
+    context.read<CartProvider>().addToCart(widget.laptop);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Added to cart'),
+        duration: Duration(milliseconds: 800),
+      ),
+    );
+  },
+                              child: Container(
                                 padding: EdgeInsets.all(isTiny ? 5 : isSmall ? 6 : 8),
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
@@ -387,9 +405,12 @@ class _LaptopCardState extends State<LaptopCard> {
                                   Icons.shopping_cart_outlined,
                                   color: Colors.white,
                                   size: isTiny ? 10 : isSmall ? 12 : 16,
+                                  
                                 ),
                               ),
+                              )
                             ],
+                          
                           ),
                         ],
                       ),

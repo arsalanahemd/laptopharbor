@@ -778,13 +778,55 @@
 //     super.dispose();
 //   }
 // }
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:flutter/material.dart';
+// import 'package:laptop_harbor/firebase_options.dart';
+// // import 'package:laptop_harbor/models/laptop_model.dart';
+// // import 'package:laptop_harbor/pages/CategoriesPage.dart';
+// // import 'package:laptop_harbor/pages/laptop_home_page.dart';
+// // import 'package:laptop_harbor/pages/laptop_detail_screen.dart';
+// import 'package:laptop_harbor/services/wrapper.dart';
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp(
+//     options: DefaultFirebaseOptions.currentPlatform,
+//   );
+//   runApp(const LaptopHarborApp());
+// }
+// class LaptopHarborApp extends StatelessWidget {
+//   const LaptopHarborApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Laptop Harbor',
+//       debugShowCheckedModeBanner: false,
+//       theme: ThemeData(
+//         primarySwatch: Colors.red,
+//         scaffoldBackgroundColor: const Color(0xFFF5F7FA),
+//         fontFamily: 'SF Pro',
+//       ),
+//       home: const AuthWrapper(),
+//       // routes: {'/categories': (context) => CategoriesPage()},
+//       // onGenerateRoute: (settings) {
+//         // if (settings.name == '/details') {
+//           // final laptop = settings.arguments as LaptopModel;
+//           // return MaterialPageRoute(
+//             // builder: (_) => LaptopDetailScreen(laptop: laptop),
+//           // );
+//         // }
+//         // return null;
+//       // },
+//     );
+//   }
+// }
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:laptop_harbor/providers/wishlist_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:laptop_harbor/firebase_options.dart';
-// import 'package:laptop_harbor/models/laptop_model.dart';
-// import 'package:laptop_harbor/pages/CategoriesPage.dart';
-// import 'package:laptop_harbor/pages/laptop_home_page.dart';
-// import 'package:laptop_harbor/pages/laptop_detail_screen.dart';
+import 'package:laptop_harbor/providers/cart_provider.dart';
 import 'package:laptop_harbor/services/wrapper.dart';
 
 void main() async {
@@ -794,30 +836,28 @@ void main() async {
   );
   runApp(const LaptopHarborApp());
 }
+
 class LaptopHarborApp extends StatelessWidget {
   const LaptopHarborApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Laptop Harbor',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-        scaffoldBackgroundColor: const Color(0xFFF5F7FA),
-        fontFamily: 'SF Pro',
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => WishlistProvider()),
+        // Agar future me aur providers chahiye to yahan add karo
+      ],
+      child: MaterialApp(
+        title: 'Laptop Harbor',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.red,
+          scaffoldBackgroundColor: const Color(0xFFF5F7FA),
+          fontFamily: 'SF Pro',
+        ),
+        home: const AuthWrapper(), // Ye tumhara auth/login wrapper
       ),
-      home: const AuthWrapper(),
-      // routes: {'/categories': (context) => CategoriesPage()},
-      // onGenerateRoute: (settings) {
-        // if (settings.name == '/details') {
-          // final laptop = settings.arguments as LaptopModel;
-          // return MaterialPageRoute(
-            // builder: (_) => LaptopDetailScreen(laptop: laptop),
-          // );
-        // }
-        // return null;
-      // },
     );
   }
 }

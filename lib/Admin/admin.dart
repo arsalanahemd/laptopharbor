@@ -114,11 +114,11 @@ class AdminSidebar extends StatelessWidget {
   final Function(int) onItemSelected;
 
   const AdminSidebar({
-    Key? key,
+    super.key,
     required this.selectedIndex,
     required this.navItems,
     required this.onItemSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -288,8 +288,7 @@ class AdminTopBar extends StatelessWidget {
   final bool isMobile;
   final VoidCallback? onMenuPressed;
 
-  const AdminTopBar({Key? key, this.isMobile = false, this.onMenuPressed})
-    : super(key: key);
+  const AdminTopBar({super.key, this.isMobile = false, this.onMenuPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -378,7 +377,7 @@ class AdminTopBar extends StatelessWidget {
 
 // Dashboard Home Page (Responsive)
 class DashboardHomePage extends StatelessWidget {
-  const DashboardHomePage({Key? key}) : super(key: key);
+  const DashboardHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -481,14 +480,14 @@ class StatCard extends StatelessWidget {
   final bool isPositive;
 
   const StatCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.value,
     required this.icon,
     required this.color,
     required this.percentage,
     required this.isPositive,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -573,7 +572,7 @@ class StatCard extends StatelessWidget {
 
 // Recent Orders Widget
 class RecentOrdersWidget extends StatelessWidget {
-  const RecentOrdersWidget({Key? key}) : super(key: key);
+  const RecentOrdersWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -722,7 +721,7 @@ class RecentOrdersWidget extends StatelessWidget {
 
 // Top Products Widget
 class TopProductsWidget extends StatelessWidget {
-  const TopProductsWidget({Key? key}) : super(key: key);
+  const TopProductsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -788,7 +787,7 @@ class TopProductsWidget extends StatelessWidget {
 
 // Placeholder Pages
 class OrdersPage extends StatelessWidget {
-  const OrdersPage({Key? key}) : super(key: key);
+  const OrdersPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -797,7 +796,7 @@ class OrdersPage extends StatelessWidget {
 }
 
 class UsersPage extends StatelessWidget {
-  const UsersPage({Key? key}) : super(key: key);
+  const UsersPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -806,7 +805,7 @@ class UsersPage extends StatelessWidget {
 }
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {

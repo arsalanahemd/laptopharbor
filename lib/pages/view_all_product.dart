@@ -1,3 +1,5 @@
+// ignore_for_file: use_super_parameters
+
 import 'package:flutter/material.dart';
 import 'package:laptop_harbor/models/laptop_model.dart';
 import 'package:laptop_harbor/data/laptop_data.dart';

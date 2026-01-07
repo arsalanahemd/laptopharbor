@@ -495,6 +495,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
+
   Widget _buildLogoutButton() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16),

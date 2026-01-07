@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // ✅ Export this file as: admin/admin_product_form.dart
 // Products Page with Add/Edit Form (Mobile Responsive)
 class AddProductsPage extends StatefulWidget {
-  const AddProductsPage({Key? key}) : super(key: key);
+  const AddProductsPage({super.key});
 
   @override
   State<AddProductsPage> createState() => _ProductsPageState();
