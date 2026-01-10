@@ -10,8 +10,8 @@ List<LaptopModel> laptopData = [
     price: 199999,
     originalPrice: 229999,
     processor: 'Apple M3 Pro',
-    ram: 16,              // ✅ int value
-    storage: 512,         // ✅ int value
+    ram: 16,
+    storage: 512,
     display: '14.2" Liquid Retina XDR',
     rating: 4.8,
     reviews: 1250,
@@ -21,6 +21,7 @@ List<LaptopModel> laptopData = [
     isHotDeal: true,
     isMostSale: true,
     isNewArrival: false,
+    discount: 13.04, // ✅ Discount added
   ),
 
   LaptopModel(
@@ -42,28 +43,30 @@ List<LaptopModel> laptopData = [
     isHotDeal: true,
     isMostSale: false,
     isNewArrival: true,
+    discount: 10.81, // ✅ Discount added
   ),
 
-  LaptopModel(
-    id: '3',
-    name: 'Lenovo ThinkPad X1 Carbon',
-    brand: 'Lenovo',
-    imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853',
-    price: 145000,
-    originalPrice: 165000,
-    processor: 'Intel i7 13th Gen',
-    ram: 16,
-    storage: 1024,
-    display: '14" FHD IPS',
-    rating: 4.6,
-    reviews: 890,
-    inStock: true,
-    features: ['TrackPoint', 'Military Grade', 'Fast Charging'],
-    category: 'Business',
-    isHotDeal: false,
-    isMostSale: true,
-    isNewArrival: false,
-  ),
+  // LaptopModel(
+  //   id: '3',
+  //   name: 'Lenovo ThinkPad X1 Carbon',
+  //   brand: 'Lenovo',
+  //   imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853',
+  //   price: 145000,
+  //   originalPrice: 165000,
+  //   processor: 'Intel i7 13th Gen',
+  //   ram: 16,
+  //   storage: 1024,
+  //   display: '14" FHD IPS',
+  //   rating: 4.6,
+  //   reviews: 890,
+  //   inStock: true,
+  //   features: ['TrackPoint', 'Military Grade', 'Fast Charging'],
+  //   category: 'Business',
+  //   isHotDeal: false,
+  //   isMostSale: true,
+  //   isNewArrival: false,
+  //   discount: 12.12, // ✅ Discount added
+  // ),
 
   // ✨ NEW ARRIVALS
   LaptopModel(
@@ -85,6 +88,7 @@ List<LaptopModel> laptopData = [
     isHotDeal: false,
     isMostSale: false,
     isNewArrival: true,
+    discount: 11.43, // ✅ Discount added
   ),
 
   LaptopModel(
@@ -106,6 +110,7 @@ List<LaptopModel> laptopData = [
     isHotDeal: true,
     isMostSale: true,
     isNewArrival: true,
+    discount: 10.26, // ✅ Discount added
   ),
 
   LaptopModel(
@@ -127,6 +132,7 @@ List<LaptopModel> laptopData = [
     isHotDeal: true,
     isMostSale: false,
     isNewArrival: true,
+    discount: 14.29, // ✅ Discount added
   ),
 
   // 💎 BUDGET FRIENDLY
@@ -149,6 +155,7 @@ List<LaptopModel> laptopData = [
     isHotDeal: true,
     isMostSale: true,
     isNewArrival: false,
+    discount: 15.38, // ✅ Discount added
   ),
 
   // Additional Laptops for Sections
@@ -171,6 +178,7 @@ List<LaptopModel> laptopData = [
     isHotDeal: true,
     isMostSale: false,
     isNewArrival: false,
+    discount: 12.82, // ✅ Discount added
   ),
 
   LaptopModel(
@@ -192,6 +200,7 @@ List<LaptopModel> laptopData = [
     isHotDeal: true,
     isMostSale: true,
     isNewArrival: false,
+    discount: 13.89, // ✅ Discount added
   ),
 
   LaptopModel(
@@ -213,6 +222,7 @@ List<LaptopModel> laptopData = [
     isHotDeal: false,
     isMostSale: false,
     isNewArrival: true,
+    discount: 12.20, // ✅ Discount added
   ),
 
   // Premium Collection
@@ -235,6 +245,7 @@ List<LaptopModel> laptopData = [
     isHotDeal: false,
     isMostSale: true,
     isNewArrival: true,
+    discount: 9.38, // ✅ Discount added
   ),
 
   LaptopModel(
@@ -256,6 +267,7 @@ List<LaptopModel> laptopData = [
     isHotDeal: false,
     isMostSale: false,
     isNewArrival: true,
+    discount: 12.90, // ✅ Discount added
   ),
 
   LaptopModel(
@@ -277,6 +289,7 @@ List<LaptopModel> laptopData = [
     isHotDeal: false,
     isMostSale: false,
     isNewArrival: true,
+    discount: 13.46, // ✅ Discount added
   ),
 
   LaptopModel(
@@ -298,6 +311,7 @@ List<LaptopModel> laptopData = [
     isHotDeal: false,
     isMostSale: true,
     isNewArrival: false,
+    discount: 15.22, // ✅ Discount added
   ),
 
   LaptopModel(
@@ -319,5 +333,6 @@ List<LaptopModel> laptopData = [
     isHotDeal: true,
     isMostSale: false,
     isNewArrival: false,
+    discount: 14.71, // ✅ Discount added
   ),
 ];

@@ -104,7 +104,7 @@
 
 // claud ai
 import 'package:flutter/material.dart';
-import 'package:laptop_harbor/models/laptop_model.dart';
+// import 'package:laptop_harbor/models/laptop_model.dart';
 
 class FilterOptions {
   RangeValues priceRange;

@@ -405,7 +405,9 @@ class CartItemCard extends StatelessWidget {
                               ],
                             ),
                             child: Text(
-                              '-${laptop.discount.toStringAsFixed(0)}%',
+                              // '-${laptop.discount.toStringAsFixed(0)}%',
+                              "${laptop.discount.toStringAsFixed(0)}% OFF",
+
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 10,
@@ -496,7 +498,9 @@ class CartItemCard extends StatelessWidget {
                               children: [
                                 if (hasDiscount)
                                   Text(
-                                    'Rs ${laptop.originalPrice.toStringAsFixed(0)}',
+                                    // 'Rs ${laptop.originalPrice.toStringAsFixed(0)}',
+                                    "${laptop.discount.toStringAsFixed(0)}% OFF",
+
                                     style: TextStyle(
                                       fontSize: 11,
                                       color: Colors.grey[500],
