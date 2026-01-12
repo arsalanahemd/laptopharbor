@@ -1,5 +1,7 @@
 // lib/providers/laptop_provider.dart
 
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import '../models/laptop_model.dart';
 import '../services/firestore_service.dart';

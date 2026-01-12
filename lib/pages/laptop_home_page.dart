@@ -1,19 +1,12 @@
-// // ignore_for_file: unused_element
-
+// // ignore_for_file: avoid_print
 // import 'package:flutter/material.dart';
-// import 'package:laptop_harbor/Admin/admin.dart';
-// // import 'package:laptop_harbor/Admin/admin.dart';
-// // import 'package:laptop_harbor/auth/login_page.dart';
-// import 'package:laptop_harbor/data/laptop_data.dart';
-// // import 'package:laptop_harbor/models/Admin/admin.dart';
-// import 'package:laptop_harbor/pages/orders_page.dart';
 // import 'package:laptop_harbor/models/laptop_model.dart';
 // import 'package:laptop_harbor/pages/CategoriesPage.dart';
 // import 'package:laptop_harbor/pages/laptop_detail_screen.dart';
-// // import 'package:laptop_harbor/pages/orders_page.dart';
+// import 'package:laptop_harbor/pages/orders_page.dart';
 // import 'package:laptop_harbor/pages/profile_page.dart';
-// // import 'package:laptop_harbor/pages/view_all_product.dart';
 // import 'package:laptop_harbor/pages/wishlist_page.dart';
+// import 'package:laptop_harbor/services/firestore_service.dart';
 // import 'package:laptop_harbor/widgets/app_drawer.dart';
 // import 'package:laptop_harbor/widgets/custom_app_bar.dart';
 // import 'package:laptop_harbor/widgets/custom_bottom_nav.dart';
@@ -32,25 +25,69 @@
 //   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 //   final PageController _pageController = PageController();
 //   final TextEditingController _searchController = TextEditingController();
+//   final FirestoreService _firestoreService = FirestoreService();
 
 //   List<LaptopModel> laptops = [];
 //   List<LaptopModel> filteredLaptops = [];
 
 //   int _selectedIndex = 0;
 //   bool _isSearchOpen = false;
+//   bool _isLoading = true;
+//   String _errorMessage = '';
 
 //   FilterOptions _filterOptions = FilterOptions();
 
 //   @override
 //   void initState() {
 //     super.initState();
-//     laptops = laptopData;
-//     filteredLaptops = laptops;
+//     _loadLaptops();
+//   }
+
+//   // ================= LOAD LAPTOPS FROM FIREBASE =================
+//   Future<void> _loadLaptops() async {
+//     if (!mounted) return; // Safety check
     
+//     setState(() {
+//       _isLoading = true;
+//       _errorMessage = '';
+//     });
+
+//     try {
+//       final data = await _firestoreService.getAllLaptops();
+      
+//       if (!mounted) return; // Check again before setState
+      
+//       setState(() {
+//         laptops = data;
+//         filteredLaptops = data;
+//         _isLoading = false;
+//       });
+      
+//       print('✅ Loaded ${laptops.length} laptops from Firebase');
+//     } catch (e) {
+//       if (!mounted) return; // Check again before setState
+      
+//       setState(() {
+//         _errorMessage = 'Failed to load laptops: $e';
+//         _isLoading = false;
+//       });
+//       print('❌ Error loading laptops: $e');
+//     }
+//   }
+
+//   // ================= FORCE REFRESH =================
+//   Future<void> _handleRefresh() async {
+//     if (!mounted) return; // Safety check
+    
+//     print('🔄 Refreshing data...');
+//     await _firestoreService.clearCache();
+//     await _loadLaptops();
 //   }
 
 //   // ================= SEARCH =================
 //   void _onSearchChanged(String query) {
+//     if (!mounted) return; // Safety check
+    
 //     setState(() {
 //       filteredLaptops = _applyFilters(query);
 //     });
@@ -114,6 +151,21 @@
 //     _pageController.jumpToPage(index);
 //   }
 
+//   // ================= WISHLIST =================
+//   final Set<String> _wishlist = {};
+
+//   void _toggleWishlist(String laptopId) {
+//     if (!mounted) return; // Safety check
+    
+//     setState(() {
+//       if (_wishlist.contains(laptopId)) {
+//         _wishlist.remove(laptopId);
+//       } else {
+//         _wishlist.add(laptopId);
+//       }
+//     });
+//   }
+
 //   // ================= DATA =================
 //   List<LaptopModel> _hotDeals() =>
 //       laptops.where((l) => l.isHotDeal).take(6).toList();
@@ -131,12 +183,6 @@
 //       key: _scaffoldKey,
 //       drawer: AppDrawer(
 //         onClose: () => Navigator.pop(context),
-//         profile: const {
-//           'name': 'John Doe',
-//           'title': 'Premium Member',
-//           'avatar':
-//               'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-//         },
 //       ),
 //       body: Column(
 //         children: [
@@ -156,26 +202,27 @@
 //                 });
 //               },
 //               onFilterClick: _showFilterDialog,
-//               onMenuClick: () =>
-//                   _scaffoldKey.currentState?.openDrawer(),
+//               onMenuClick: () => _scaffoldKey.currentState?.openDrawer(),
 //               onCartClick: () {},
-              
-//               cartCount: 3, onNotificationClick: () {  }, onSearchClick: () {  }, onClose: () {  },
+//               cartCount: 3,
+//               onNotificationClick: () {},
+//               onSearchClick: () {},
+//               onClose: () {},
 //             ),
 
 //           /// ✅ PAGES
 //           Expanded(
 //             child: PageView(
 //               controller: _pageController,
-//               onPageChanged: (i) =>
-//                   setState(() => _selectedIndex = i),
+//               onPageChanged: (i) => setState(() => _selectedIndex = i),
 //               children: [
 //                 _buildHome(),
 //                 const CategoriesPage(),
 //                 const OrderPage(),
 //                 const WishlistPage(),
-//                 const AdminDashboard(),
-//                 // const ProfilePage(),
+//                 // const AdminDashboard(),
+//                 // const DebugCartScreen(),
+//                 const ProfilePage(),
 //               ],
 //             ),
 //           ),
@@ -190,8 +237,61 @@
 
 //   // ================= HOME =================
 //   Widget _buildHome() {
-//     bool isFiltering =
-//         _searchController.text.isNotEmpty ||
+//     // Loading State
+//     if (_isLoading) {
+//       return const Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             CircularProgressIndicator(),
+//             SizedBox(height: 16),
+//             Text('Loading laptops...'),
+//           ],
+//         ),
+//       );
+//     }
+
+//     // Error State
+//     if (_errorMessage.isNotEmpty) {
+//       return Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             const Icon(Icons.error_outline, size: 60, color: Colors.red),
+//             const SizedBox(height: 16),
+//             Text(_errorMessage),
+//             const SizedBox(height: 16),
+//             ElevatedButton.icon(
+//               onPressed: _handleRefresh,
+//               icon: const Icon(Icons.refresh),
+//               label: const Text('Retry'),
+//             ),
+//           ],
+//         ),
+//       );
+//     }
+
+//     // Empty State
+//     if (laptops.isEmpty) {
+//       return Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             const Icon(Icons.laptop_chromebook, size: 60),
+//             const SizedBox(height: 16),
+//             const Text('No laptops available'),
+//             const SizedBox(height: 16),
+//             ElevatedButton.icon(
+//               onPressed: _handleRefresh,
+//               icon: const Icon(Icons.refresh),
+//               label: const Text('Refresh'),
+//             ),
+//           ],
+//         ),
+//       );
+//     }
+
+//     bool isFiltering = _searchController.text.isNotEmpty ||
 //         _filterOptions.selectedBrands.isNotEmpty ||
 //         _filterOptions.selectedRamSizes.isNotEmpty ||
 //         _filterOptions.priceRange.start > 0 ||
@@ -200,52 +300,35 @@
 
 //     // 🔍 SEARCH / FILTER MODE
 //     if (isFiltering) {
-//       return SingleChildScrollView(
-//         child: Column(
-//           children: [
-//             _allProducts(),
-//             const SizedBox(height: 20),
-//           ],
+//       return RefreshIndicator(
+//         onRefresh: _handleRefresh,
+//         child: SingleChildScrollView(
+//           physics: const AlwaysScrollableScrollPhysics(),
+//           child: Column(
+//             children: [
+//               _allProducts(),
+//               const SizedBox(height: 20),
+//             ],
+//           ),
 //         ),
 //       );
 //     }
 
 //     // 🏠 NORMAL HOME
-//     return SingleChildScrollView(
-//       child: Column(
-//         children: [
-//           // _hero(),
-//           const HeroSection(),
-//           _section('🔥 Hot Deals', _hotDeals()),
-//           _section('✨ New Arrivals', _newArrivals()),
-//           _section('💰 Most Sale', _mostSale()),
-//           _section('💎 Premium', _premium()),
-//           _allProducts(),
-//           const SizedBox(height: 20),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _hero() {
-//     return Container(
-//       margin: const EdgeInsets.all(16),
-//       height: 160,
-//       decoration: BoxDecoration(
-//         borderRadius: BorderRadius.circular(16),
-//         gradient: const LinearGradient(
-//           colors: [Color(0xFF1E293B), Color(0xFF1E40AF)],
-//         ),
-//       ),
-//       child: const Center(
-//         child: Text(
-//           'Up to 30% OFF on Premium Laptops',
-//           style: TextStyle(
-//             color: Colors.white,
-//             fontSize: 22,
-//             fontWeight: FontWeight.bold,
-//           ),
-//           textAlign: TextAlign.center,
+//     return RefreshIndicator(
+//       onRefresh: _handleRefresh,
+//       child: SingleChildScrollView(
+//         physics: const AlwaysScrollableScrollPhysics(),
+//         child: Column(
+//           children: [
+//             const HeroSection(),
+//             _section('🔥 Hot Deals', _hotDeals()),
+//             _section('✨ New Arrivals', _newArrivals()),
+//             _section('💰 Most Sale', _mostSale()),
+//             _section('💎 Premium', _premium()),
+//             _allProducts(),
+//             const SizedBox(height: 20),
+//           ],
 //         ),
 //       ),
 //     );
@@ -258,15 +341,22 @@
 //       children: [
 //         Padding(
 //           padding: const EdgeInsets.all(16),
-//           child: Align(
-//             alignment: Alignment.centerLeft,
-//             child: Text(
-//               title,
-//               style: const TextStyle(
-//                 fontSize: 20,
-//                 fontWeight: FontWeight.bold,
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               Text(
+//                 title,
+//                 style: const TextStyle(
+//                   fontSize: 20,
+//                   fontWeight: FontWeight.bold,
+//                 ),
 //               ),
-//             ),
+//               TextButton.icon(
+//                 onPressed: _handleRefresh,
+//                 icon: const Icon(Icons.refresh, size: 16),
+//                 label: const Text('Refresh'),
+//               ),
+//             ],
 //           ),
 //         ),
 //         SizedBox(
@@ -279,15 +369,21 @@
 //               width: 190,
 //               child: LaptopCard(
 //                 laptop: items[i],
-//                 onFavorite: () {},
+//                 onFavorite: () {
+//                   _toggleWishlist(items[i].id);
+//                 },
 //                 onTap: () {
 //                   Navigator.push(
 //                     context,
 //                     MaterialPageRoute(
-//                       builder: (_) =>
-//                           LaptopDetailScreen(laptop: items[i]),
+//                       builder: (_) => LaptopDetailScreen(laptop: items[i]),
 //                     ),
 //                   );
+//                 },
+//                 isInWishlist: _wishlist.contains(items[i].id),
+//                 showWishlistButton: true,
+//                 onWishlistToggle: () {
+//                   _toggleWishlist(items[i].id);
 //                 },
 //               ),
 //             ),
@@ -323,8 +419,7 @@
 //       physics: const NeverScrollableScrollPhysics(),
 //       padding: const EdgeInsets.all(16),
 //       itemCount: filteredLaptops.length,
-//       gridDelegate:
-//           const SliverGridDelegateWithFixedCrossAxisCount(
+//       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
 //         crossAxisCount: 2,
 //         childAspectRatio: 0.7,
 //         crossAxisSpacing: 12,
@@ -332,15 +427,21 @@
 //       ),
 //       itemBuilder: (_, i) => LaptopCard(
 //         laptop: filteredLaptops[i],
-//         onFavorite: () {},
+//         onFavorite: () {
+//           _toggleWishlist(filteredLaptops[i].id);
+//         },
 //         onTap: () {
 //           Navigator.push(
 //             context,
 //             MaterialPageRoute(
-//               builder: (_) =>
-//                   LaptopDetailScreen(laptop: filteredLaptops[i]),
+//               builder: (_) => LaptopDetailScreen(laptop: filteredLaptops[i]),
 //             ),
 //           );
+//         },
+//         isInWishlist: _wishlist.contains(filteredLaptops[i].id),
+//         showWishlistButton: true,
+//         onWishlistToggle: () {
+//           _toggleWishlist(filteredLaptops[i].id);
 //         },
 //       ),
 //     );
@@ -353,15 +454,13 @@
 //     super.dispose();
 //   }
 // }
-// lib/pages/laptop_home_page.dart
-
+// ignore_for_file: avoid_print
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:laptop_harbor/Admin/admin.dart';
 import 'package:laptop_harbor/models/laptop_model.dart';
 import 'package:laptop_harbor/pages/CategoriesPage.dart';
 import 'package:laptop_harbor/pages/laptop_detail_screen.dart';
 import 'package:laptop_harbor/pages/orders_page.dart';
+import 'package:laptop_harbor/pages/profile_page.dart';
 import 'package:laptop_harbor/pages/wishlist_page.dart';
 import 'package:laptop_harbor/services/firestore_service.dart';
 import 'package:laptop_harbor/widgets/app_drawer.dart';
@@ -378,7 +477,7 @@ class LaptopHomePage extends StatefulWidget {
   State<LaptopHomePage> createState() => _LaptopHomePageState();
 }
 
-class _LaptopHomePageState extends State<LaptopHomePage> {
+class _LaptopHomePageState extends State<LaptopHomePage> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final PageController _pageController = PageController();
   final TextEditingController _searchController = TextEditingController();
@@ -394,14 +493,42 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
 
   FilterOptions _filterOptions = FilterOptions();
 
+  late AnimationController _loadingController;
+  late AnimationController _fadeController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _fadeAnimation;
+
   @override
   void initState() {
     super.initState();
+    _setupAnimations();
     _loadLaptops();
+  }
+
+  void _setupAnimations() {
+    _loadingController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+
+    _fadeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
+      CurvedAnimation(parent: _loadingController, curve: Curves.easeInOut),
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(
+      CurvedAnimation(parent: _loadingController, curve: Curves.easeInOut),
+    );
   }
 
   // ================= LOAD LAPTOPS FROM FIREBASE =================
   Future<void> _loadLaptops() async {
+    if (!mounted) return;
+    
     setState(() {
       _isLoading = true;
       _errorMessage = '';
@@ -409,6 +536,9 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
 
     try {
       final data = await _firestoreService.getAllLaptops();
+      
+      if (!mounted) return;
+      
       setState(() {
         laptops = data;
         filteredLaptops = data;
@@ -417,6 +547,8 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
       
       print('✅ Loaded ${laptops.length} laptops from Firebase');
     } catch (e) {
+      if (!mounted) return;
+      
       setState(() {
         _errorMessage = 'Failed to load laptops: $e';
         _isLoading = false;
@@ -427,6 +559,8 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
 
   // ================= FORCE REFRESH =================
   Future<void> _handleRefresh() async {
+    if (!mounted) return;
+    
     print('🔄 Refreshing data...');
     await _firestoreService.clearCache();
     await _loadLaptops();
@@ -434,6 +568,8 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
 
   // ================= SEARCH =================
   void _onSearchChanged(String query) {
+    if (!mounted) return;
+    
     setState(() {
       filteredLaptops = _applyFilters(query);
     });
@@ -497,6 +633,21 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
     _pageController.jumpToPage(index);
   }
 
+  // ================= WISHLIST =================
+  final Set<String> _wishlist = {};
+
+  void _toggleWishlist(String laptopId) {
+    if (!mounted) return;
+    
+    setState(() {
+      if (_wishlist.contains(laptopId)) {
+        _wishlist.remove(laptopId);
+      } else {
+        _wishlist.add(laptopId);
+      }
+    });
+  }
+
   // ================= DATA =================
   List<LaptopModel> _hotDeals() =>
       laptops.where((l) => l.isHotDeal).take(6).toList();
@@ -514,11 +665,6 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
       key: _scaffoldKey,
       drawer: AppDrawer(
         onClose: () => Navigator.pop(context),
-        profile: const {
-          'name': 'John Doe',
-          'title': 'Premium Member',
-          'avatar': 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-        },
       ),
       body: Column(
         children: [
@@ -556,8 +702,7 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
                 const CategoriesPage(),
                 const OrderPage(),
                 const WishlistPage(),
-                const AdminDashboard(),
-                // const (),
+                const ProfilePage(),
               ],
             ),
           ),
@@ -567,21 +712,111 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
         selectedIndex: _selectedIndex,
         onTabChange: _onNavTap,
       ),
+      floatingActionButton: _selectedIndex == 0
+          ? AnimatedBuilder(
+              animation: _loadingController,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: 1.0 + (_scaleAnimation.value - 1.0) * 0.05,
+                  child: FloatingActionButton(
+                    onPressed: _isLoading ? null : _handleRefresh,
+                    backgroundColor: Colors.blue[700],
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                            ),
+                          )
+                        : const Icon(Icons.refresh_rounded, color: Colors.white),
+                  ),
+                );
+              },
+            )
+          : null,
     );
   }
 
   // ================= HOME =================
   Widget _buildHome() {
-    // Loading State
+    // Loading State with Beautiful Animation
     if (_isLoading) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Loading laptops...'),
-          ],
+      return Center(
+        child: AnimatedBuilder(
+          animation: _loadingController,
+          builder: (context, child) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Animated Laptop Icon
+                Transform.scale(
+                  scale: _scaleAnimation.value,
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.blue[400]!.withOpacity(_fadeAnimation.value),
+                          Colors.blue[700]!.withOpacity(_fadeAnimation.value),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blue.withOpacity(0.3 * _fadeAnimation.value),
+                          blurRadius: 30,
+                          spreadRadius: 10,
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.laptop_mac,
+                      size: 60,
+                      color: Colors.white.withOpacity(_fadeAnimation.value),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                // Animated Dots
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(3, (index) {
+                    return AnimatedBuilder(
+                      animation: _loadingController,
+                      builder: (context, child) {
+                        final delay = index * 0.2;
+                        final value = (_loadingController.value + delay) % 1.0;
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.blue[700]!.withOpacity(value),
+                          ),
+                        );
+                      },
+                    );
+                  }),
+                ),
+                const SizedBox(height: 16),
+                // Text
+                Opacity(
+                  opacity: _fadeAnimation.value,
+                  child: const Text(
+                    'Loading laptops...',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       );
     }
@@ -589,19 +824,57 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
     // Error State
     if (_errorMessage.isNotEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 60, color: Colors.red),
-            const SizedBox(height: 16),
-            Text(_errorMessage),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: _handleRefresh,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.red[50],
+                ),
+                child: Icon(
+                  Icons.error_outline_rounded,
+                  size: 64,
+                  color: Colors.red[400],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Oops! Something went wrong',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                _errorMessage,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton.icon(
+                onPressed: _handleRefresh,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Try Again'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[700],
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -609,19 +882,56 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
     // Empty State
     if (laptops.isEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.laptop_chromebook, size: 60),
-            const SizedBox(height: 16),
-            const Text('No laptops available'),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: _handleRefresh,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Refresh'),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey[100],
+                ),
+                child: Icon(
+                  Icons.laptop_chromebook_rounded,
+                  size: 64,
+                  color: Colors.grey[400],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'No laptops available',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Check back later for new products',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton.icon(
+                onPressed: _handleRefresh,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Refresh'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[700],
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -662,7 +972,7 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
             _section('💰 Most Sale', _mostSale()),
             _section('💎 Premium', _premium()),
             _allProducts(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 80), // Extra space for FAB
           ],
         ),
       ),
@@ -686,11 +996,6 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              TextButton.icon(
-                onPressed: _handleRefresh,
-                icon: const Icon(Icons.refresh, size: 16),
-                label: const Text('Refresh'),
-              ),
             ],
           ),
         ),
@@ -704,7 +1009,9 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
               width: 190,
               child: LaptopCard(
                 laptop: items[i],
-                onFavorite: () {},
+                onFavorite: () {
+                  _toggleWishlist(items[i].id);
+                },
                 onTap: () {
                   Navigator.push(
                     context,
@@ -712,6 +1019,11 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
                       builder: (_) => LaptopDetailScreen(laptop: items[i]),
                     ),
                   );
+                },
+                isInWishlist: _wishlist.contains(items[i].id),
+                showWishlistButton: true,
+                onWishlistToggle: () {
+                  _toggleWishlist(items[i].id);
                 },
               ),
             ),
@@ -723,18 +1035,37 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
 
   Widget _allProducts() {
     if (filteredLaptops.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.all(32),
+      return Padding(
+        padding: const EdgeInsets.all(48),
         child: Column(
           children: [
-            Icon(Icons.search_off, size: 64, color: Colors.grey),
-            SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey[100],
+              ),
+              child: Icon(
+                Icons.search_off_rounded,
+                size: 64,
+                color: Colors.grey[400],
+              ),
+            ),
+            const SizedBox(height: 24),
             Text(
               'No products found',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey,
+                color: Colors.grey[700],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Try adjusting your filters',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
               ),
             ),
           ],
@@ -755,7 +1086,9 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
       ),
       itemBuilder: (_, i) => LaptopCard(
         laptop: filteredLaptops[i],
-        onFavorite: () {},
+        onFavorite: () {
+          _toggleWishlist(filteredLaptops[i].id);
+        },
         onTap: () {
           Navigator.push(
             context,
@@ -764,12 +1097,19 @@ class _LaptopHomePageState extends State<LaptopHomePage> {
             ),
           );
         },
+        isInWishlist: _wishlist.contains(filteredLaptops[i].id),
+        showWishlistButton: true,
+        onWishlistToggle: () {
+          _toggleWishlist(filteredLaptops[i].id);
+        },
       ),
     );
   }
 
   @override
   void dispose() {
+    _loadingController.dispose();
+    _fadeController.dispose();
     _pageController.dispose();
     _searchController.dispose();
     super.dispose();

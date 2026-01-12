@@ -134,6 +134,8 @@
 // // }
 // lib/services/firebase_storage_service.dart
 
+// ignore_for_file: avoid_print
+
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;

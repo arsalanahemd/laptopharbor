@@ -1,32 +1,37 @@
-class WishlistModel {
-  final String id;
-  final String title;
-  final double price;
-  final String image;
+import 'package:laptop_harbor/models/laptop_model.dart';
 
-  WishlistModel({
+class WishlistItem {
+  final String id;
+  final String laptopId;
+  final String userId;
+  final LaptopModel laptop;
+  final DateTime addedAt;
+
+  WishlistItem({
     required this.id,
-    required this.title,
-    required this.price,
-    required this.image,
+    required this.laptopId,
+    required this.userId,
+    required this.laptop,
+    required this.addedAt,
   });
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'title': title,
-      'price': price,
-      'image': image,
-      'createdAt': DateTime.now(),
+      'laptopId': laptopId,
+      'userId': userId,
+      'laptop': laptop.toJson(),
+      'addedAt': addedAt.toIso8601String(),
     };
   }
 
-  factory WishlistModel.fromMap(Map<String, dynamic> map) {
-    return WishlistModel(
-      id: map['id'],
-      title: map['title'],
-      price: map['price'],
-      image: map['image'],
+  factory WishlistItem.fromJson(Map<String, dynamic> json) {
+    return WishlistItem(
+      id: json['id']?.toString() ?? '',
+      laptopId: json['laptopId']?.toString() ?? '',
+      userId: json['userId']?.toString() ?? '',
+      laptop: LaptopModel.fromJson(json['laptop'] ?? {}, json['laptopId'] ?? ''),
+      addedAt: DateTime.parse(json['addedAt']?.toString() ?? DateTime.now().toIso8601String()),
     );
   }
 }

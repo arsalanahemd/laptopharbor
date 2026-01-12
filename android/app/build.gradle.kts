@@ -7,9 +7,15 @@ plugins {
 }
 
 android {
+     defaultConfig {
+        ndk {
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
+        }
+    }
     namespace = "com.example.laptop_harbor"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "25.1.8937393" 
+     compileSdk = 34  
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -33,6 +39,8 @@ android {
 
     buildTypes {
         release {
+              isMinifyEnabled = false  // Pehle false karo
+            isShrinkResources = false  // Ye bhi fals
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")

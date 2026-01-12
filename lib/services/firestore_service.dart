@@ -391,6 +391,8 @@
 // }
 // lib/services/firestore_service.dart
 
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/laptop_model.dart';
 
