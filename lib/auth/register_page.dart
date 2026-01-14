@@ -142,7 +142,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
                   gradient: LinearGradient(
                     colors: [
                       const Color(0xFF1E293B),
-                      const Color(0xFF1E40AF),
+                      const Color.fromARGB(255, 30, 64, 175),
                       Color.lerp(
                         const Color(0xFF1E40AF),
                         const Color(0xFF3B82F6),

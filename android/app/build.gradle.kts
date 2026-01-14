@@ -7,47 +7,63 @@ plugins {
 }
 
 android {
-     defaultConfig {
-        ndk {
-            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
-        }
-    }
     namespace = "com.example.laptop_harbor"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = "25.1.8937393" 
-     compileSdk = 34  
-
+    
+    // ✅ SDK versions - IMPORTANT: compileSdk sirf ek baar define karo
+    compileSdk = 36  // Latest SDK
+    
+    // ✅ NDK version
+    ndkVersion = "27.0.12077973"
+    
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17  // ✅ 11 se 17 karo
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = "17"  // ✅ 11 se 17 karo
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        // ✅ Pehle ndk block rakhna chahiye
+        ndk {
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
+        }
+        
+        // TODO: Specify your own unique Application ID
         applicationId = "com.example.laptop_harbor"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        
+        // Flutter values use karo
+        minSdk = flutter.minSdkVersion  // ✅ Direct 21 rakho ya flutter.minSdkVersion
+        targetSdk = 36  // ✅ Latest SDK
+        
+        versionCode = 1  // ✅ Direct value ya flutter.versionCode
+        versionName = "1.0"  // ✅ Direct value ya flutter.versionName
     }
 
     buildTypes {
         release {
-              isMinifyEnabled = false  // Pehle false karo
-            isShrinkResources = false  // Ye bhi fals
+            // ✅ Release optimization - pehle disable rakho
+            isMinifyEnabled = false
+            isShrinkResources = false
+            
             // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            
+            // ✅ Proguard rules add karo
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // ✅ Add basic dependencies
+    implementation("androidx.core:core-ktx:1.12.0")
 }

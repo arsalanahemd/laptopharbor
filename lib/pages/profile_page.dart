@@ -551,7 +551,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:laptop_harbor/pages/Help_Support_Page.dart';
 import 'package:laptop_harbor/pages/Setting_page.dart';
-import 'package:laptop_harbor/pages/orders_page.dart';
 import 'package:laptop_harbor/pages/payment_methods.dart';
 import 'package:laptop_harbor/pages/shipping_address.dart';
 import 'package:laptop_harbor/pages/wishlist_page.dart';
@@ -1205,7 +1204,7 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           children: [
             _buildMenuItem(Icons.shopping_bag_outlined, 'My Orders', () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const OrderPage()));
+              // Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckoutScreen()));
             }),
             const Divider(height: 1),
             _buildMenuItem(Icons.favorite_border, 'Wishlist', () {

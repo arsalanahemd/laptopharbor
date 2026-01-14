@@ -1,5 +1,7 @@
 // lib/Admin/product_form.dart - Web Compatible
 
+// ignore_for_file: unused_field
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, Uint8List;
 import 'package:image_picker/image_picker.dart';
