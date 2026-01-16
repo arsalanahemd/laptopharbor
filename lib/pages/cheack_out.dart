@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:laptop_harbor/models/cart_item_model.dart';
-import '../models/laptop_model.dart';
-import '../services/auth_service.dart';
+// import '../models/laptop_model.dart';
+// import '../services/auth_service.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final List<CartItem> cartItems;
@@ -19,7 +19,7 @@ class CheckoutScreen extends StatefulWidget {
   State<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 
-class _CheckoutScreenState extends State<CheckoutScreen> {
+class _CheckoutScreenState extends State<CheckoutScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
@@ -27,16 +27,41 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _stateController = TextEditingController();
   final TextEditingController _zipCodeController = TextEditingController();
-  final TextEditingController _paymentMethodController = TextEditingController();
   
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   String _selectedPaymentMethod = 'Cash on Delivery';
   
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _setupAnimations();
+  }
+  
+  void _setupAnimations() {
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
+    
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutCubic,
+    ));
+    
+    _animationController.forward();
   }
   
   void _loadUserData() async {
@@ -75,10 +100,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         throw Exception('User not logged in');
       }
       
-      // Generate order ID
       final orderId = 'ORD${DateTime.now().millisecondsSinceEpoch}';
       
-      // Convert cart items to order items
       final orderItems = widget.cartItems.map((cartItem) {
         return {
           'productId': cartItem.laptopId,
@@ -89,7 +112,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         };
       }).toList();
       
-      // Create order data
       final orderData = {
         'id': orderId,
         'userId': user.uid,
@@ -113,13 +135,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'createdAt': FieldValue.serverTimestamp(),
       };
       
-      // Save order to Firestore
       await FirebaseFirestore.instance
           .collection('orders')
           .doc(orderId)
           .set(orderData);
       
-      // Also save to user's orders subcollection
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
@@ -127,36 +147,50 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           .doc(orderId)
           .set({'orderId': orderId, 'createdAt': FieldValue.serverTimestamp()});
       
-      // Clear cart after successful order
       await _clearCart(user.uid);
       
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Order placed successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      
-      // Navigate to order confirmation screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => OrderConfirmationScreen(orderId: orderId),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 12),
+                Text('Order placed successfully!'),
+              ],
+            ),
+            backgroundColor: Colors.green[600],
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.all(16),
+          ),
+        );
+        
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderConfirmationScreen(orderId: orderId),
+          ),
+        );
+      }
       
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error placing order: $error'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $error'),
+            backgroundColor: Colors.red[600],
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
   
@@ -175,286 +209,195 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text('Checkout'),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_rounded, color: Color(0xFF2D3748)),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Checkout',
+          style: TextStyle(
+            color: Color(0xFF2D3748),
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Shipping Information
-              const Text(
-                'Shipping Information',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              
-              _buildTextFormField(
-                controller: _fullNameController,
-                label: 'Full Name',
-                icon: Icons.person,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your full name';
-                  }
-                  return null;
-                },
-              ),
-              
-              const SizedBox(height: 12),
-              
-              _buildTextFormField(
-                controller: _emailController,
-                label: 'Email',
-                icon: Icons.email,
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  }
-                  if (!value.contains('@')) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                },
-              ),
-              
-              const SizedBox(height: 12),
-              
-              _buildTextFormField(
-                controller: _phoneController,
-                label: 'Phone Number',
-                icon: Icons.phone,
-                keyboardType: TextInputType.phone,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your phone number';
-                  }
-                  if (value.length < 10) {
-                    return 'Please enter a valid phone number';
-                  }
-                  return null;
-                },
-              ),
-              
-              const SizedBox(height: 12),
-              
-              _buildTextFormField(
-                controller: _addressController,
-                label: 'Address',
-                icon: Icons.home,
-                maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your address';
-                  }
-                  return null;
-                },
-              ),
-              
-              const SizedBox(height: 12),
-              
-              Row(
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: SlideTransition(
+          position: _slideAnimation,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: _buildTextFormField(
-                      controller: _cityController,
-                      label: 'City',
-                      icon: Icons.location_city,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your city';
-                        }
-                        return null;
-                      },
-                    ),
+                  _buildSectionHeader(
+                    icon: Icons.local_shipping_outlined,
+                    title: 'Shipping Information',
+                    color: Colors.blue,
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildTextFormField(
-                      controller: _stateController,
-                      label: 'State',
-                      icon: Icons.map,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your state';
-                        }
-                        return null;
-                      },
-                    ),
+                  const SizedBox(height: 16),
+                  
+                  _buildTextField(
+                    controller: _fullNameController,
+                    label: 'Full Name',
+                    icon: Icons.person_outline,
+                    validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
                   ),
-                ],
-              ),
-              
-              const SizedBox(height: 12),
-              
-              _buildTextFormField(
-                controller: _zipCodeController,
-                label: 'ZIP Code',
-                icon: Icons.pin_drop,
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter ZIP code';
-                  }
-                  return null;
-                },
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Payment Method
-              const Text(
-                'Payment Method',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              
-              Column(
-                children: [
-                  RadioListTile<String>(
-                    title: const Text('Cash on Delivery'),
-                    value: 'Cash on Delivery',
-                    groupValue: _selectedPaymentMethod,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedPaymentMethod = value!;
-                      });
+                  
+                  const SizedBox(height: 14),
+                  
+                  _buildTextField(
+                    controller: _emailController,
+                    label: 'Email',
+                    icon: Icons.email_outlined,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value?.isEmpty ?? true) return 'Required';
+                      if (!value!.contains('@')) return 'Invalid email';
+                      return null;
                     },
                   ),
-                  RadioListTile<String>(
-                    title: const Text('Credit/Debit Card'),
-                    value: 'Credit/Debit Card',
-                    groupValue: _selectedPaymentMethod,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedPaymentMethod = value!;
-                      });
+                  
+                  const SizedBox(height: 14),
+                  
+                  _buildTextField(
+                    controller: _phoneController,
+                    label: 'Phone Number',
+                    icon: Icons.phone_outlined,
+                    keyboardType: TextInputType.phone,
+                    validator: (value) {
+                      if (value?.isEmpty ?? true) return 'Required';
+                      if (value!.length < 10) return 'Invalid phone';
+                      return null;
                     },
                   ),
-                  RadioListTile<String>(
-                    title: const Text('UPI'),
-                    value: 'UPI',
-                    groupValue: _selectedPaymentMethod,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedPaymentMethod = value!;
-                      });
-                    },
+                  
+                  const SizedBox(height: 14),
+                  
+                  _buildTextField(
+                    controller: _addressController,
+                    label: 'Address',
+                    icon: Icons.home_outlined,
+                    maxLines: 3,
+                    validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
                   ),
-                ],
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Order Summary
-              const Text(
-                'Order Summary',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
+                  
+                  const SizedBox(height: 14),
+                  
+                  Row(
                     children: [
-                      for (final item in widget.cartItems)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  '${item.laptop.name} (x${item.quantity})',
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                              ),
-                              Text(
-                                '₹${(item.laptop.price * item.quantity).toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
+                      Expanded(
+                        child: _buildTextField(
+                          controller: _cityController,
+                          label: 'City',
+                          icon: Icons.location_city_outlined,
+                          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
                         ),
-                      
-                      const Divider(),
-                      
-                      Row(
-                        children: [
-                          const Expanded(
-                            child: Text(
-                              'Total Amount:',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            '₹${widget.totalAmount.toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildTextField(
+                          controller: _stateController,
+                          label: 'State',
+                          icon: Icons.map_outlined,
+                          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ),
-              
-              const SizedBox(height: 32),
-              
-              // Place Order Button
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _placeOrder,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                  
+                  const SizedBox(height: 14),
+                  
+                  _buildTextField(
+                    controller: _zipCodeController,
+                    label: 'ZIP Code',
+                    icon: Icons.pin_drop_outlined,
+                    keyboardType: TextInputType.number,
+                    validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Text(
-                          'PLACE ORDER',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  _buildSectionHeader(
+                    icon: Icons.payment_outlined,
+                    title: 'Payment Method',
+                    color: Colors.green,
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  _buildPaymentOptions(),
+                  
+                  const SizedBox(height: 24),
+                  
+                  _buildSectionHeader(
+                    icon: Icons.shopping_bag_outlined,
+                    title: 'Order Summary',
+                    color: Colors.orange,
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  _buildOrderSummary(),
+                  
+                  const SizedBox(height: 32),
+                  
+                  _buildPlaceOrderButton(),
+                  
+                  const SizedBox(height: 20),
+                ],
               ),
-              
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
   
-  Widget _buildTextFormField({
+  Widget _buildSectionHeader({
+    required IconData icon,
+    required String title,
+    required Color color,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [color, color.withOpacity(0.7)],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Icon(icon, color: Colors.white, size: 22),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2D3748),
+          ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildTextField({
     required TextEditingController controller,
     required String label,
     required IconData icon,
@@ -462,25 +405,235 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     int? maxLines = 1,
     String? Function(String?)? validator,
   }) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        filled: true,
-        fillColor: Colors.grey[50],
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      validator: validator,
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon, color: Colors.blue[600]),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey[200]!),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.blue[600]!, width: 2),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        validator: validator,
+      ),
+    );
+  }
+  
+  Widget _buildPaymentOptions() {
+    final paymentMethods = [
+      {'name': 'Cash on Delivery', 'icon': Icons.money},
+      {'name': 'Credit/Debit Card', 'icon': Icons.credit_card},
+      {'name': 'Wallet', 'icon': Icons.account_balance_wallet},
+    ];
+    
+    return Column(
+      children: paymentMethods.map((method) {
+        final isSelected = _selectedPaymentMethod == method['name'];
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? Colors.green[600]! : Colors.grey[300]!,
+              width: isSelected ? 2 : 1,
+            ),
+            boxShadow: [
+              if (isSelected)
+                BoxShadow(
+                  color: Colors.green.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+            ],
+          ),
+          child: RadioListTile<String>(
+            title: Row(
+              children: [
+                Icon(
+                  method['icon'] as IconData,
+                  color: isSelected ? Colors.green[600] : Colors.grey[600],
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  method['name'] as String,
+                  style: TextStyle(
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected ? Colors.green[700] : Colors.grey[800],
+                  ),
+                ),
+              ],
+            ),
+            value: method['name'] as String,
+            groupValue: _selectedPaymentMethod,
+            activeColor: Colors.green[600],
+            onChanged: (value) {
+              setState(() {
+                _selectedPaymentMethod = value!;
+              });
+            },
+          ),
+        );
+      }).toList(),
+    );
+  }
+  
+  Widget _buildOrderSummary() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          for (final item in widget.cartItems)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${item.laptop.name} (x${item.quantity})',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF4A5568),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    (item.laptop.price * item.quantity).toStringAsFixed(2),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2D3748),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          
+          const Divider(height: 24, thickness: 1),
+          
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'Total Amount:',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3748),
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.green[600]!, Colors.green[700]!],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  widget.totalAmount.toStringAsFixed(2),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildPlaceOrderButton() {
+    return Container(
+      width: double.infinity,
+      height: 56,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue[600]!, Colors.blue[700]!],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.4),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _placeOrder,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        child: _isLoading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 3,
+                ),
+              )
+            : const Text(
+                'PLACE ORDER',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                  color: Colors.white,
+                ),
+              ),
+      ),
     );
   }
   
   @override
   void dispose() {
+    _animationController.dispose();
     _fullNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
@@ -488,85 +641,182 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _cityController.dispose();
     _stateController.dispose();
     _zipCodeController.dispose();
-    _paymentMethodController.dispose();
     super.dispose();
   }
 }
 
-class OrderConfirmationScreen extends StatelessWidget {
+class OrderConfirmationScreen extends StatefulWidget {
   final String orderId;
   
   const OrderConfirmationScreen({super.key, required this.orderId});
   
   @override
+  State<OrderConfirmationScreen> createState() => _OrderConfirmationScreenState();
+}
+
+class _OrderConfirmationScreenState extends State<OrderConfirmationScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _fadeAnimation;
+  
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    
+    _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
+    );
+    
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+    );
+    
+    _controller.forward();
+  }
+  
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text('Order Confirmed'),
-        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
       ),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.check_circle,
-                color: Colors.green,
-                size: 100,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Order Placed Successfully!',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.green[400]!, Colors.green[600]!],
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.green.withOpacity(0.4),
+                          blurRadius: 30,
+                          spreadRadius: 10,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.check_rounded,
+                      color: Colors.white,
+                      size: 80,
+                    ),
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Order ID: $orderId',
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 30),
-              SizedBox(
-                width: 200,
-                child: ElevatedButton(
+                const SizedBox(height: 32),
+                const Text(
+                  'Order Placed Successfully!',
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3748),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Order ID: ${widget.orderId}',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue[700],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Container(
+                  width: double.infinity,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.blue[600]!, Colors.blue[700]!],
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blue.withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/orders',
+                        (route) => false,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: const Text(
+                      'View My Orders',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
                   onPressed: () {
-                    // Navigate to orders screen
                     Navigator.pushNamedAndRemoveUntil(
                       context,
-                      '/orders',
+                      '/home',
                       (route) => false,
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                  child: Text(
+                    'Continue Shopping',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue[700],
                     ),
                   ),
-                  child: const Text('View My Orders'),
                 ),
-              ),
-              const SizedBox(height: 10),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    '/home',
-                    (route) => false,
-                  );
-                },
-                child: const Text('Continue Shopping'),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

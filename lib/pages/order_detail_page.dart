@@ -5,7 +5,7 @@ import '../models/order_model.dart';
 class OrderDetailScreen extends StatelessWidget {
   final Order order;
   
-  const OrderDetailScreen({Key? key, required this.order}) : super(key: key);
+  const OrderDetailScreen({super.key, required this.order});
   
   @override
   Widget build(BuildContext context) {
@@ -77,15 +77,15 @@ class OrderDetailScreen extends StatelessWidget {
                             : Icon(Icons.shopping_bag),
                         title: Text(item.productName),
                         subtitle: Text('Quantity: ${item.quantity}'),
-                        trailing: Text('\₹${(item.price * item.quantity).toStringAsFixed(2)}'),
+                        trailing: Text('₹${(item.price * item.quantity).toStringAsFixed(2)}'),
                       );
-                    }).toList(),
+                    }),
                     Divider(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Total:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        Text('\₹${order.totalAmount.toStringAsFixed(2)}', 
+                        Text('₹${order.totalAmount.toStringAsFixed(2)}', 
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
                       ],
                     ),

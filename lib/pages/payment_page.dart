@@ -11,12 +11,12 @@ class PaymentScreen extends StatefulWidget {
   final bool isDirectOrder;
   
   const PaymentScreen({
-    Key? key,
+    super.key,
     required this.totalAmount,
     required this.shippingInfo,
     required this.orderItems,
     required this.isDirectOrder,
-  }) : super(key: key);
+  });
   
   @override
   _PaymentScreenState createState() => _PaymentScreenState();
@@ -76,11 +76,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ? CircularProgressIndicator()
             : ElevatedButton(
                 onPressed: _placeOrder,
-                child: Text('Place Order'),
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity, 50),
                   backgroundColor: Colors.green,
                 ),
+                child: Text('Place Order'),
               ),
       ],
     );
@@ -147,7 +147,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 class OrderConfirmationScreen extends StatelessWidget {
   final String orderId;
   
-  const OrderConfirmationScreen({Key? key, required this.orderId}) : super(key: key);
+  const OrderConfirmationScreen({super.key, required this.orderId});
   
   @override
   Widget build(BuildContext context) {

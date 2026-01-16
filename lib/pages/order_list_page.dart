@@ -5,6 +5,8 @@ import '../services/order_service.dart';
 import '../models/order_model.dart';
 
 class OrderListScreen extends StatelessWidget {
+  const OrderListScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final orderService = OrderService();
@@ -44,7 +46,7 @@ class OrderListScreen extends StatelessWidget {
 class OrderCard extends StatelessWidget {
   final Order order;
   
-  const OrderCard({Key? key, required this.order}) : super(key: key);
+  const OrderCard({super.key, required this.order});
   
   @override
   Widget build(BuildContext context) {
@@ -57,7 +59,7 @@ class OrderCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('${order.items.length} item(s)'),
-            Text('Total: \₹${order.totalAmount.toStringAsFixed(2)}'),
+            Text('Total: ₹${order.totalAmount.toStringAsFixed(2)}'),
             SizedBox(height: 4),
             Chip(
               label: Text(

@@ -376,7 +376,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                   ],
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),
@@ -502,7 +502,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                   ],
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

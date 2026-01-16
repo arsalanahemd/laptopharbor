@@ -4,7 +4,7 @@ import '../models/order_model.dart';
 class ShippingForm extends StatefulWidget {
   final Function(ShippingInfo) onSaved;
   
-  const ShippingForm({Key? key, required this.onSaved}) : super(key: key);
+  const ShippingForm({super.key, required this.onSaved});
   
   @override
   _ShippingFormState createState() => _ShippingFormState();
@@ -155,10 +155,10 @@ class _ShippingFormState extends State<ShippingForm> {
             
             ElevatedButton(
               onPressed: _saveShippingInfo,
-              child: Text('Save Shipping Info'),
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(double.infinity, 50),
               ),
+              child: Text('Save Shipping Info'),
             ),
           ],
         ),
