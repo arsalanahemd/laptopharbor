@@ -743,7 +743,7 @@
 //     );
 //   }
 
-// ignore_for_file: unused_element
+// // ignore_for_file: unused_element, unnecessary_brace_in_string_interps
 
 //   void _showCheckoutDialog(BuildContext context, CartProvider cart) {
 //     showDialog(
@@ -867,7 +867,7 @@
 import 'package:flutter/material.dart';
 import 'package:laptop_harbor/models/cart_item_model.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // ✅ Firebase Auth import add karein
+import 'package:laptop_harbor/pages/cheack_out.dart'; // Add this import
 import '../providers/cart_provider.dart';
 import '../widgets/cart_item_card.dart';
 
@@ -1139,6 +1139,7 @@ class _CartScreenState extends State<CartScreen>
 
   // ✅ Safe Opacity Widget
   Widget _buildAnimatedOpacity(double value, Widget? child) {
+    // Ensure opacity is within 0.0 to 1.0 range
     final safeOpacity = value.clamp(0.0, 1.0);
     return Opacity(
       opacity: safeOpacity,
@@ -1153,6 +1154,7 @@ class _CartScreenState extends State<CartScreen>
       duration: Duration(milliseconds: 400 + (index * 100)),
       curve: Curves.easeOutBack,
       builder: (context, value, child) {
+        // ✅ Clamp value to 0.0-1.0 range
         final safeValue = value.clamp(0.0, 1.0);
         return Transform.scale(
           scale: safeValue,
@@ -1168,6 +1170,7 @@ class _CartScreenState extends State<CartScreen>
       duration: const Duration(milliseconds: 800),
       curve: Curves.easeOutBack,
       builder: (context, value, child) {
+        // ✅ Clamp value to 0.0-1.0 range
         final safeValue = value.clamp(0.0, 1.0);
         return Transform.scale(
           scale: safeValue,
@@ -1329,7 +1332,7 @@ class _CartScreenState extends State<CartScreen>
           _buildSummaryItem(
             icon: Icons.account_balance_wallet_outlined,
             label: 'Subtotal',
-            value: '₹${cart.totalAmount.toStringAsFixed(0)}',
+            value: '₹${cart.totalAmount.toStringAsFixed(2)}',
             color: Colors.green,
           ),
         ],
@@ -1415,7 +1418,7 @@ class _CartScreenState extends State<CartScreen>
                   children: [
                     _buildPriceRow(
                       'Subtotal',
-                      '₹${cart.totalAmount.toStringAsFixed(0)}',
+                      '₹${cart.totalAmount.toStringAsFixed(2)}',
                       false,
                     ),
                     const SizedBox(height: 8),
@@ -1431,7 +1434,7 @@ class _CartScreenState extends State<CartScreen>
                     ),
                     _buildPriceRow(
                       'Total',
-                      '₹${cart.totalAmount.toStringAsFixed(0)}',
+                      '₹${cart.totalAmount.toStringAsFixed(2)}',
                       true,
                     ),
                   ],
@@ -1439,7 +1442,6 @@ class _CartScreenState extends State<CartScreen>
               ),
               const SizedBox(height: 12),
 
-              // ✅ CHECKOUT BUTTON - ONTAP HANDLER CHANGE KAR DIYA
               Container(
                 width: double.infinity,
                 height: 56,
@@ -1459,7 +1461,6 @@ class _CartScreenState extends State<CartScreen>
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    // ✅ YAHAN CHANGE KAR DIYA - Checkout screen par navigate karega
                     onTap: () => _navigateToCheckout(context, cart),
                     borderRadius: BorderRadius.circular(16),
                     child: const Row(
@@ -1517,7 +1518,6 @@ class _CartScreenState extends State<CartScreen>
     );
   }
 
-  // Clear Cart Dialog
   void _showClearCartDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -1609,98 +1609,127 @@ class _CartScreenState extends State<CartScreen>
     );
   }
 
-  // ✅ YE NAYA METHOD - Checkout screen par navigate karega
+  // ✅ **UPDATED: Navigate to Checkout Screen**
   void _navigateToCheckout(BuildContext context, CartProvider cart) {
-    final user = FirebaseAuth.instance.currentUser;
-    
-    if (user == null) {
-      // User not logged in - show login dialog
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.orange[50],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.lock,
-                  color: Colors.orange,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'Login Required',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          content: const Text(
-            'You need to login to proceed with checkout',
-            style: TextStyle(fontSize: 15),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+    // Cart items ko direct navigate karenge
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CheckoutScreen(
+          cartItems: cart.items,
+          totalAmount: cart.totalAmount,
+        ),
+      ),
+    );
+  }
+
+  // ✅ **UPDATED: Checkout Dialog (Optional)**
+  void _showCheckoutDialog(BuildContext context, CartProvider cart) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Row(
+          children: [
             Container(
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [const Color.fromARGB(255, 30, 133, 235)!, Colors.blue[600]!],
+                  colors: [Colors.green[400]!, Colors.green[600]!],
                 ),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, '/login');
-                  },
-                  borderRadius: BorderRadius.circular(8),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Text(
-                      'Login',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+              child: const Icon(
+                Icons.check_circle_outline_rounded,
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Ready to Checkout?',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Order Summary:',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '${cart.totalItems} items',
+              style: const TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Total: ₹${cart.totalAmount.toStringAsFixed(2)}',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[700],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Proceed to checkout?',
+              style: TextStyle(fontSize: 14),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Review Cart',
+              style: TextStyle(
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue[700]!, Colors.blue[600]!],
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                  _navigateToCheckout(context, cart);
+                },
+                borderRadius: BorderRadius.circular(8),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Text(
+                    'Proceed',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
             ),
-          ],
-        ),
-      );
-    } else {
-      // User logged in - navigate to checkout screen
-      Navigator.pushNamed(context, '/checkout');
-    }
-  }
-
-  // ✅ Ye purana method - aap ise remove kar sakte hain ya rakh sakte hain
-  void _showCheckoutDialog(BuildContext context, CartProvider cart) {
-    // Is method ko aap remove kar sakte hain
-    // Kyunki ab hum direct checkout screen par navigate karenge
-    _navigateToCheckout(context, cart);
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -666,6 +666,10 @@
 // ignore_for_file: avoid_print
 import 'package:flutter/material.dart';
 import 'package:laptop_harbor/Admin/admin.dart';
+import 'package:laptop_harbor/Admin/admin_order_page.dart';
+import 'package:laptop_harbor/pages/order_list_page.dart';
+import 'package:laptop_harbor/pages/orders_page.dart';
+import 'package:laptop_harbor/widgets/order_status.dart';
 import 'package:provider/provider.dart';
 import 'package:laptop_harbor/models/laptop_model.dart';
 import 'package:laptop_harbor/pages/CategoriesPage.dart';
@@ -968,11 +972,16 @@ class _LaptopHomePageState extends State<LaptopHomePage> with TickerProviderStat
                   children: [
                     _buildHome(),
                     const CategoriesPage(),
-                    // const MyOrdersScreen(),
-                    // MyOrdersScreen(),
+                    //  OrderListScreen(),
+                    // OrderStatusWidget(status: '',),\
+                    OrderListScreen(),
                     const WishlistPage(),
+                    // OrderPage(),
                     // const ProfilePage(),
-                    const AdminDashboard(),
+                    // const AdminDashboard(),
+                    AdminOrderScreen()
+                    
+
                   ],
                 ),
               ),

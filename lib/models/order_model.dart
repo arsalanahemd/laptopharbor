@@ -1,74 +1,70 @@
-class OrderModel {
-  String? orderId;
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class Order {
+  String id;
   String userId;
-  String email;
-  String phone;
-  String address;
-  List<CartItem> items;
+  List<OrderItem> items;
   double totalAmount;
+  ShippingInfo shippingInfo;
+  String status; // pending, confirmed, processing, shipped, delivered, cancelled
   DateTime orderDate;
-  String status; // 'pending', 'confirmed', 'shipped', 'delivered', 'cancelled'
-  String? paymentMethod;
-  String? transactionId;
+  PaymentInfo paymentInfo;
+  String? trackingNumber;
+  String? address;
   
-  OrderModel({
-    this.orderId,
+  Order({
+    required this.id,
     required this.userId,
-    required this.email,
-    required this.phone,
-    required this.address,
     required this.items,
     required this.totalAmount,
-    required this.orderDate,
+    required this.shippingInfo,
     this.status = 'pending',
-    this.paymentMethod,
-    this.transactionId,
+    required this.orderDate,
+    required this.paymentInfo,
+    this.trackingNumber,
+    this.address,
   });
   
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'userId': userId,
-      'email': email,
-      'phone': phone,
-      'address': address,
       'items': items.map((item) => item.toMap()).toList(),
       'totalAmount': totalAmount,
-      'orderDate': orderDate.toIso8601String(),
+      'shippingInfo': shippingInfo.toMap(),
       'status': status,
-      'paymentMethod': paymentMethod,
-      'transactionId': transactionId,
+      'orderDate': orderDate.toIso8601String(),
+      'paymentInfo': paymentInfo.toMap(),
+      'trackingNumber': trackingNumber,
+      'createdAt': FieldValue.serverTimestamp(),
     };
   }
   
-  factory OrderModel.fromMap(String id, Map<String, dynamic> map) {
-    return OrderModel(
-      orderId: id,
-      userId: map['userId'],
-      email: map['email'],
-      phone: map['phone'],
-      address: map['address'],
-      items: List<CartItem>.from(
-        map['items'].map((x) => CartItem.fromMap(x))
-      ),
-      totalAmount: map['totalAmount'],
-      orderDate: DateTime.parse(map['orderDate']),
-      status: map['status'],
-      paymentMethod: map['paymentMethod'],
-      transactionId: map['transactionId'],
+  factory Order.fromMap(Map<String, dynamic> data) {
+    return Order(
+      id: data['id'],
+      userId: data['userId'],
+      items: (data['items'] as List).map((item) => OrderItem.fromMap(item)).toList(),
+      totalAmount: data['totalAmount'].toDouble(),
+      shippingInfo: ShippingInfo.fromMap(data['shippingInfo']),
+      status: data['status'],
+      orderDate: DateTime.parse(data['orderDate']),
+      paymentInfo: PaymentInfo.fromMap(data['paymentInfo']),
+      trackingNumber: data['trackingNumber'],
     );
   }
 }
 
-class CartItem {
+class OrderItem {
   String productId;
-  String name;
+  String productName;
   double price;
   int quantity;
   String? imageUrl;
   
-  CartItem({
+  OrderItem({
     required this.productId,
-    required this.name,
+    required this.productName,
     required this.price,
     required this.quantity,
     this.imageUrl,
@@ -77,20 +73,92 @@ class CartItem {
   Map<String, dynamic> toMap() {
     return {
       'productId': productId,
-      'name': name,
+      'productName': productName,
       'price': price,
       'quantity': quantity,
       'imageUrl': imageUrl,
     };
   }
   
-  factory CartItem.fromMap(Map<String, dynamic> map) {
-    return CartItem(
-      productId: map['productId'],
-      name: map['name'],
-      price: map['price'],
-      quantity: map['quantity'],
-      imageUrl: map['imageUrl'],
+  factory OrderItem.fromMap(Map<String, dynamic> data) {
+    return OrderItem(
+      productId: data['productId'],
+      productName: data['productName'],
+      price: data['price'].toDouble(),
+      quantity: data['quantity'],
+      imageUrl: data['imageUrl'],
+    );
+  }
+}
+
+class ShippingInfo {
+  String fullName;
+  String email;
+  String phone;
+  String address;
+  String city;
+  String state;
+  String zipCode;
+  
+  ShippingInfo({
+    required this.fullName,
+    required this.email,
+    required this.phone,
+    required this.address,
+    required this.city,
+    required this.state,
+    required this.zipCode,
+  });
+  
+  Map<String, dynamic> toMap() {
+    return {
+      'fullName': fullName,
+      'email': email,
+      'phone': phone,
+      'address': address,
+      'city': city,
+      'state': state,
+      'zipCode': zipCode,
+    };
+  }
+  
+  factory ShippingInfo.fromMap(Map<String, dynamic> data) {
+    return ShippingInfo(
+      fullName: data['fullName'],
+      email: data['email'],
+      phone: data['phone'],
+      address: data['address'],
+      city: data['city'],
+      state: data['state'],
+      zipCode: data['zipCode'],
+    );
+  }
+}
+
+class PaymentInfo {
+  String method; // cod, card, upi, etc.
+  String? transactionId;
+  bool isPaid;
+  
+  PaymentInfo({
+    required this.method,
+    this.transactionId,
+    this.isPaid = false,
+  });
+  
+  Map<String, dynamic> toMap() {
+    return {
+      'method': method,
+      'transactionId': transactionId,
+      'isPaid': isPaid,
+    };
+  }
+  
+  factory PaymentInfo.fromMap(Map<String, dynamic> data) {
+    return PaymentInfo(
+      method: data['method'],
+      transactionId: data['transactionId'],
+      isPaid: data['isPaid'] ?? false,
     );
   }
 }

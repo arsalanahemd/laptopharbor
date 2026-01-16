@@ -67,7 +67,7 @@ class CartProvider with ChangeNotifier {
           laptop: laptop,
           quantity: quantity,
           price: laptop.price,
-          addedAt: DateTime.now(),
+          addedAt: DateTime.now(), 
         );
         
         _items.add(newItem);

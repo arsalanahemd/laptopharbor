@@ -127,7 +127,7 @@ class WishlistProvider with ChangeNotifier {
       
       _wishlistSubscription = _wishlistService.getWishlistIdsStream().listen(
         (List<String> ids) {
-          _wishlistIds = ids ?? []; // ✅ NULL CHECK
+          _wishlistIds = ids; // ✅ NULL CHECK
           _isLoading = false;
           notifyListeners();
         },

@@ -1,6 +1,7 @@
  
-
 // lib/pages/CategoriesPage.dart
+
+// ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
 import 'package:laptop_harbor/models/laptop_model.dart';
