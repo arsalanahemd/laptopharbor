@@ -210,7 +210,7 @@ class WishlistProvider with ChangeNotifier {
     return _wishlistService.getWishlistItemsStream();
   }
 
-  get items => null;
+  Null get items => null;
 
   Future<List<LaptopModel>> getWishlistItems() async {
     try {

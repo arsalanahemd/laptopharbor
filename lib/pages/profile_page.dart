@@ -5,6 +5,7 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:laptop_harbor/pages/Help_Support_Page.dart';
 // import 'package:laptop_harbor/pages/Setting_page.dart';
+// import 'package:laptop_harbor/pages/laptop_home_page.dart';
 // import 'package:laptop_harbor/pages/payment_methods.dart';
 // import 'package:laptop_harbor/pages/shipping_address.dart';
 // import 'package:laptop_harbor/pages/wishlist_page.dart';
@@ -20,10 +21,10 @@
 // class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin {
 //   final FirebaseAuth _auth = FirebaseAuth.instance;
 //   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
 //   bool isEditing = false;
 //   bool _isLoading = true;
-  
+
 //   final _nameController = TextEditingController();
 //   final _emailController = TextEditingController();
 //   final _phoneController = TextEditingController();
@@ -98,7 +99,7 @@
 
 //     try {
 //       final user = _auth.currentUser;
-      
+
 //       if (user != null) {
 //         _emailController.text = user.email ?? 'No email';
 
@@ -109,12 +110,12 @@
 
 //         if (userDoc.exists) {
 //           final data = userDoc.data()!;
-          
+
 //           setState(() {
 //             _nameController.text = data['name'] ?? user.displayName ?? 'User';
 //             _phoneController.text = data['phone'] ?? '';
 //             _addressController.text = data['address'] ?? '';
-            
+
 //             final name = _nameController.text;
 //             if (name.isNotEmpty) {
 //               final parts = name.split(' ');
@@ -184,7 +185,7 @@
 
 //       for (var doc in ordersSnapshot.docs) {
 //         final status = doc.data()['status'] as String? ?? '';
-        
+
 //         if (status == 'pending') {
 //           pending++;
 //         } else if (status == 'delivered') {
@@ -242,7 +243,7 @@
 
 //       if (mounted) {
 //         Navigator.pop(context);
-        
+
 //         setState(() {
 //           isEditing = false;
 //         });
@@ -266,7 +267,7 @@
 //     } catch (e) {
 //       if (mounted) {
 //         Navigator.pop(context);
-        
+
 //         ScaffoldMessenger.of(context).showSnackBar(
 //           SnackBar(
 //             content: Text('Error: ${e.toString()}'),
@@ -286,24 +287,118 @@
 //     });
 //   }
 
+//   // Future<void> _handleLogout() async {
+//   //   try {
+//   //     await AuthService().logout();
+
+//   //     if (mounted) {
+//   //       Navigator.of(context).pushReplacementNamed('/login');
+//   //     }
+//   //   } catch (e) {
+//   //     if (mounted) {
+//   //       ScaffoldMessenger.of(context).showSnackBar(
+//   //         SnackBar(
+//   //           content: Text('Logout failed: $e'),
+//   //           backgroundColor: Colors.red[600],
+//   //         ),
+//   //       );
+//   //     }
+//   //   }
+//   // }
 //   Future<void> _handleLogout() async {
-//     try {
-//       await AuthService().logout();
-      
-//       if (mounted) {
-//         Navigator.of(context).pushReplacementNamed('/login');
-//       }
-//     } catch (e) {
-//       if (mounted) {
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(
-//             content: Text('Logout failed: $e'),
-//             backgroundColor: Colors.red[600],
+//   try {
+//     await AuthService().logout();
+
+//     if (mounted) {
+//       Navigator.of(context).pushReplacementNamed('/login');
+//     }
+//   } catch (e) {
+//     if (mounted) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(
+//           content: Row(
+//             children: [
+//               const Icon(Icons.error_outline, color: Colors.white),
+//               const SizedBox(width: 12),
+//               Expanded(
+//                 child: Text('❌ Logout failed: $e'),
+//               ),
+//             ],
 //           ),
-//         );
-//       }
+//           backgroundColor: Colors.red[700],
+//           behavior: SnackBarBehavior.floating,
+//           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+//           margin: const EdgeInsets.all(16),
+//         ),
+//       );
 //     }
 //   }
+// }
+
+// void _showLogoutDialog() {
+//   showDialog(
+//     context: context,
+//     builder: (context) => AlertDialog(
+//       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+//       title: Row(
+//         children: [
+//           Container(
+//             padding: const EdgeInsets.all(8),
+//             decoration: BoxDecoration(
+//               color: Colors.red[50],
+//               borderRadius: BorderRadius.circular(10),
+//             ),
+//             child: Icon(Icons.logout, color: Colors.red[700]),
+//           ),
+//           const SizedBox(width: 12),
+//           const Text('Logout'),
+//         ],
+//       ),
+//       content: const Text(
+//         'Are you sure you want to logout?',
+//         style: TextStyle(fontSize: 15),
+//       ),
+//       actions: [
+//         TextButton(
+//           onPressed: () => Navigator.pop(context),
+//           style: TextButton.styleFrom(
+//             foregroundColor: Colors.grey[700],
+//             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+//           ),
+//           child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.w600)),
+//         ),
+//         Container(
+//           decoration: BoxDecoration(
+//             borderRadius: BorderRadius.circular(12),
+//             gradient: LinearGradient(
+//               colors: [Colors.red[400]!, Colors.red[600]!],
+//             ),
+//           ),
+//           child: Material(
+//             color: Colors.transparent,
+//             child: InkWell(
+//               borderRadius: BorderRadius.circular(12),
+//               onTap: () {
+//                 Navigator.pop(context);
+//                 _handleLogout();
+//               },
+//               child: const Padding(
+//                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+//                 child: Text(
+//                   'Logout',
+//                   style: TextStyle(
+//                     color: Colors.white,
+//                     fontWeight: FontWeight.bold,
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ),
+//       ],
+//     ),
+//   );
+// }
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -454,17 +549,40 @@
 //             ),
 //           ),
 //         ),
-        
+
 //         // Profile content
 //         SafeArea(
 //           child: Column(
 //             children: [
-//               // Top actions bar
+//               // Top actions bar with Back Button
 //               Padding(
 //                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
 //                 child: Row(
 //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //                   children: [
+//                     // Back Button
+//                     GestureDetector(
+//                       onTap: () {
+//                         // Navigator.pop(context); // Home screen par le jayega
+//                       Navigator.of(context).pushAndRemoveUntil(
+//       MaterialPageRoute(builder: (context) => LaptopHomePage()),
+//       (Route<dynamic> route) => false,
+//     );
+//                       },
+//                       child: Container(
+//                         padding: const EdgeInsets.all(8),
+//                         decoration: BoxDecoration(
+//                           color: Colors.white.withOpacity(0.2),
+//                           borderRadius: BorderRadius.circular(10),
+//                         ),
+//                         child: const Icon(
+//                           Icons.arrow_back_rounded,
+//                           color: Colors.white,
+//                           size: 20,
+//                         ),
+//                       ),
+//                     ),
+
 //                     const Text(
 //                       'Profile',
 //                       style: TextStyle(
@@ -473,6 +591,7 @@
 //                         color: Colors.white,
 //                       ),
 //                     ),
+
 //                     Container(
 //                       decoration: BoxDecoration(
 //                         color: Colors.white.withOpacity(0.2),
@@ -481,19 +600,19 @@
 //                       child: IconButton(
 //                         icon: const Icon(Icons.settings_outlined, color: Colors.white),
 //                         onPressed: () {
-//                           Navigator.push(
-//                             context,
-//                             MaterialPageRoute(builder: (_) => const SettingsPage()),
-//                           );
+//                           // Navigator.push(
+//                             // context,
+//                             // MaterialPageRoute(builder: (_) => const SettingsPage()),
+//                           // );
 //                         },
 //                       ),
 //                     ),
 //                   ],
 //                 ),
 //               ),
-              
+
 //               const SizedBox(height: 20),
-              
+
 //               // Profile picture
 //               ScaleTransition(
 //                 scale: _scaleAnimation,
@@ -550,9 +669,9 @@
 //                   ],
 //                 ),
 //               ),
-              
+
 //               const SizedBox(height: 16),
-              
+
 //               // Name
 //               if (isEditing)
 //                 Padding(
@@ -592,9 +711,9 @@
 //                     letterSpacing: 0.3,
 //                   ),
 //                 ),
-              
+
 //               const SizedBox(height: 8),
-              
+
 //               // Email badge
 //               Container(
 //                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
@@ -622,9 +741,9 @@
 //                   ],
 //                 ),
 //               ),
-              
+
 //               const SizedBox(height: 20),
-              
+
 //               // Edit/Save buttons
 //               if (!isEditing)
 //                 Container(
@@ -711,7 +830,7 @@
 //                     ),
 //                   ],
 //                 ),
-              
+
 //               const SizedBox(height: 20),
 //             ],
 //           ),
@@ -931,7 +1050,7 @@
 //             final index = entry.key;
 //             final item = entry.value;
 //             final isLast = index == menuItems.length - 1;
-            
+
 //             return Column(
 //               children: [
 //                 _buildMenuItem(
@@ -1093,13 +1212,14 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin {
+class _ProfilePageState extends State<ProfilePage>
+    with TickerProviderStateMixin {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   bool isEditing = false;
   bool _isLoading = true;
-  
+
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -1140,17 +1260,15 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
       duration: const Duration(milliseconds: 500),
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeIn));
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.2),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(parent: _scaleController, curve: Curves.elasticOut),
@@ -1174,7 +1292,7 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
 
     try {
       final user = _auth.currentUser;
-      
+
       if (user != null) {
         _emailController.text = user.email ?? 'No email';
 
@@ -1185,12 +1303,12 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
 
         if (userDoc.exists) {
           final data = userDoc.data()!;
-          
+
           setState(() {
             _nameController.text = data['name'] ?? user.displayName ?? 'User';
             _phoneController.text = data['phone'] ?? '';
             _addressController.text = data['address'] ?? '';
-            
+
             final name = _nameController.text;
             if (name.isNotEmpty) {
               final parts = name.split(' ');
@@ -1210,7 +1328,6 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
       _fadeController.forward();
       _slideController.forward();
       _scaleController.forward();
-
     } catch (e) {
       print('❌ Error loading user data: $e');
       if (mounted) {
@@ -1219,7 +1336,9 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
             content: Text('Failed to load profile: $e'),
             backgroundColor: Colors.red[600],
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       }
@@ -1260,7 +1379,7 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
 
       for (var doc in ordersSnapshot.docs) {
         final status = doc.data()['status'] as String? ?? '';
-        
+
         if (status == 'pending') {
           pending++;
         } else if (status == 'delivered') {
@@ -1294,9 +1413,7 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        builder: (context) => const Center(child: CircularProgressIndicator()),
       );
 
       await _firestore.collection('users').doc(user.uid).update({
@@ -1318,7 +1435,7 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
 
       if (mounted) {
         Navigator.pop(context);
-        
+
         setState(() {
           isEditing = false;
         });
@@ -1334,7 +1451,9 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
             ),
             backgroundColor: Colors.green[600],
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             margin: const EdgeInsets.all(16),
           ),
         );
@@ -1342,13 +1461,15 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: ${e.toString()}'),
             backgroundColor: Colors.red[600],
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       }
@@ -1362,10 +1483,11 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
     });
   }
 
+  // ✅ Updated Logout function (same as drawer)
   Future<void> _handleLogout() async {
     try {
       await AuthService().logout();
-      
+
       if (mounted) {
         Navigator.of(context).pushReplacementNamed('/login');
       }
@@ -1373,12 +1495,92 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Logout failed: $e'),
-            backgroundColor: Colors.red[600],
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text('❌ Logout failed: $e')),
+              ],
+            ),
+            backgroundColor: Colors.red[700],
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
           ),
         );
       }
     }
+  }
+
+  // ✅ Same as drawer logout dialog
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red[50],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.logout, color: Colors.red[700]),
+            ),
+            const SizedBox(width: 12),
+            const Text('Logout'),
+          ],
+        ),
+        content: const Text(
+          'Are you sure you want to logout?',
+          style: TextStyle(fontSize: 15),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.grey[700],
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                colors: [Colors.red[400]!, Colors.red[600]!],
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () {
+                  Navigator.pop(context);
+                  _handleLogout();
+                },
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Text(
+                    'Logout',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -1410,10 +1612,7 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                               width: 3,
                             ),
                             gradient: LinearGradient(
-                              colors: [
-                                Colors.blue[400]!,
-                                Colors.transparent,
-                              ],
+                              colors: [Colors.blue[400]!, Colors.transparent],
                               stops: const [0.5, 0.5],
                             ),
                           ),
@@ -1505,6 +1704,7 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                   child: _buildMenuOptions(),
                 ),
                 const SizedBox(height: 20),
+                // ✅ Same logout button as drawer
                 _buildLogoutButton(),
                 const SizedBox(height: 80),
               ],
@@ -1530,25 +1730,29 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
             ),
           ),
         ),
-        
+
         // Profile content
         SafeArea(
           child: Column(
             children: [
               // Top actions bar with Back Button
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // Back Button
                     GestureDetector(
                       onTap: () {
-                        // Navigator.pop(context); // Home screen par le jayega
-                      Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => LaptopHomePage()),
-      (Route<dynamic> route) => false,
-    );
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => LaptopHomePage(),
+                          ),
+                          (Route<dynamic> route) => false,
+                        );
                       },
                       child: Container(
                         padding: const EdgeInsets.all(8),
@@ -1563,7 +1767,7 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                         ),
                       ),
                     ),
-                    
+
                     const Text(
                       'Profile',
                       style: TextStyle(
@@ -1572,28 +1776,33 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                         color: Colors.white,
                       ),
                     ),
-                    
+
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: IconButton(
-                        icon: const Icon(Icons.settings_outlined, color: Colors.white),
+                        icon: const Icon(
+                          Icons.settings_outlined,
+                          color: Colors.white,
+                        ),
                         onPressed: () {
-                          // Navigator.push(
-                            // context,
-                            // MaterialPageRoute(builder: (_) => const SettingsPage()),
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const SettingsPage(),
+                            ),
+                          );
                         },
                       ),
                     ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Profile picture
               ScaleTransition(
                 scale: _scaleAnimation,
@@ -1650,15 +1859,18 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Name
               if (isEditing)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
@@ -1684,7 +1896,9 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                 )
               else
                 Text(
-                  _nameController.text.isNotEmpty ? _nameController.text : 'User',
+                  _nameController.text.isNotEmpty
+                      ? _nameController.text
+                      : 'User',
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -1692,12 +1906,15 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                     letterSpacing: 0.3,
                   ),
                 ),
-              
+
               const SizedBox(height: 8),
-              
+
               // Email badge
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.25),
                   borderRadius: BorderRadius.circular(16),
@@ -1722,9 +1939,9 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Edit/Save buttons
               if (!isEditing)
                 Container(
@@ -1750,7 +1967,11 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.edit_rounded, size: 18, color: Colors.blue[700]),
+                            Icon(
+                              Icons.edit_rounded,
+                              size: 18,
+                              color: Colors.blue[700],
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               'Edit Profile',
@@ -1775,17 +1996,26 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white.withOpacity(0.2),
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
-                          side: const BorderSide(color: Colors.white, width: 1.5),
+                          side: const BorderSide(
+                            color: Colors.white,
+                            width: 1.5,
+                          ),
                         ),
                       ),
                       child: const Row(
                         children: [
                           Icon(Icons.close_rounded, size: 18),
                           SizedBox(width: 6),
-                          Text('Cancel', style: TextStyle(fontWeight: FontWeight.w600)),
+                          Text(
+                            'Cancel',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
                         ],
                       ),
                     ),
@@ -1795,7 +2025,10 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.green[600],
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1805,13 +2038,16 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                         children: [
                           Icon(Icons.check_rounded, size: 18),
                           SizedBox(width: 6),
-                          Text('Save', style: TextStyle(fontWeight: FontWeight.w600)),
+                          Text(
+                            'Save',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
-              
+
               const SizedBox(height: 20),
             ],
           ),
@@ -1825,17 +2061,43 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
-          Expanded(child: _buildStatCard('Pending', '$_pendingOrders', Icons.schedule_rounded, Colors.orange)),
+          Expanded(
+            child: _buildStatCard(
+              'Pending',
+              '$_pendingOrders',
+              Icons.schedule_rounded,
+              Colors.orange,
+            ),
+          ),
           const SizedBox(width: 14),
-          Expanded(child: _buildStatCard('Delivered', '$_deliveredOrders', Icons.check_circle_rounded, Colors.green)),
+          Expanded(
+            child: _buildStatCard(
+              'Delivered',
+              '$_deliveredOrders',
+              Icons.check_circle_rounded,
+              Colors.green,
+            ),
+          ),
           const SizedBox(width: 14),
-          Expanded(child: _buildStatCard('Processing', '$_processingOrders', Icons.sync_rounded, Colors.blue)),
+          Expanded(
+            child: _buildStatCard(
+              'Processing',
+              '$_processingOrders',
+              Icons.sync_rounded,
+              Colors.blue,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildStatCard(String label, String count, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String label,
+    String count,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -1980,9 +2242,15 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.blue[600]!, width: 2),
+                        borderSide: BorderSide(
+                          color: Colors.blue[600]!,
+                          width: 2,
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
                     ),
                   )
                 else
@@ -1991,7 +2259,9 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
-                      color: controller.text.isNotEmpty ? const Color(0xFF2D3748) : Colors.grey[400],
+                      color: controller.text.isNotEmpty
+                          ? const Color(0xFF2D3748)
+                          : Colors.grey[400],
                     ),
                   ),
               ],
@@ -2005,11 +2275,31 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
   Widget _buildMenuOptions() {
     final menuItems = [
       {'icon': Icons.shopping_bag_outlined, 'title': 'My Orders', 'page': null},
-      {'icon': Icons.favorite_border, 'title': 'Wishlist', 'page': const WishlistPage()},
-      {'icon': Icons.location_on_outlined, 'title': 'Shipping Address', 'page': const ShippingAddressPage()},
-      {'icon': Icons.payment_outlined, 'title': 'Payment Methods', 'page': const PaymentMethodsPage()},
-      {'icon': Icons.settings_outlined, 'title': 'Settings', 'page': const SettingsPage()},
-      {'icon': Icons.help_outline, 'title': 'Help & Support', 'page': const HelpSupportPage()},
+      {
+        'icon': Icons.favorite_border,
+        'title': 'Wishlist',
+        'page': const WishlistPage(),
+      },
+      {
+        'icon': Icons.location_on_outlined,
+        'title': 'Shipping Address',
+        'page': const ShippingAddressPage(),
+      },
+      {
+        'icon': Icons.payment_outlined,
+        'title': 'Payment Methods',
+        'page': const PaymentMethodsPage(),
+      },
+      {
+        'icon': Icons.settings_outlined,
+        'title': 'Settings',
+        'page': const SettingsPage(),
+      },
+      {
+        'icon': Icons.help_outline,
+        'title': 'Help & Support',
+        'page': const HelpSupportPage(),
+      },
     ];
 
     return Padding(
@@ -2031,7 +2321,7 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
             final index = entry.key;
             final item = entry.value;
             final isLast = index == menuItems.length - 1;
-            
+
             return Column(
               children: [
                 _buildMenuItem(
@@ -2070,7 +2360,10 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.blue[50]!, Colors.blue[100]!.withOpacity(0.3)],
+                    colors: [
+                      Colors.blue[50]!,
+                      Colors.blue[100]!.withOpacity(0.3),
+                    ],
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -2087,7 +2380,11 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
                   ),
                 ),
               ),
-              Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey[400]),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 16,
+                color: Colors.grey[400],
+              ),
             ],
           ),
         ),
@@ -2095,78 +2392,48 @@ class _ProfilePageState extends State<ProfilePage> with TickerProviderStateMixin
     );
   }
 
+  // ✅ Same as drawer logout button
   Widget _buildLogoutButton() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
       child: Container(
         decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
             colors: [Colors.red[400]!, Colors.red[600]!],
           ),
-          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
               color: Colors.red.withOpacity(0.3),
               blurRadius: 12,
-              offset: const Offset(0, 6),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: ElevatedButton.icon(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                title: const Text(
-                  'Logout',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                content: const Text('Are you sure you want to logout?'),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(color: Colors.grey[600]),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: _showLogoutDialog,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.logout, color: Colors.white, size: 22),
+                  SizedBox(width: 12),
+                  Text(
+                    'Logout',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _handleLogout();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red[600],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Text('Logout'),
                   ),
                 ],
               ),
-            );
-          },
-          icon: const Icon(Icons.logout_rounded, size: 20),
-          label: const Text(
-            'Logout',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
             ),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            foregroundColor: Colors.white,
-            shadowColor: Colors.transparent,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            minimumSize: const Size(double.infinity, 54),
           ),
         ),
       ),

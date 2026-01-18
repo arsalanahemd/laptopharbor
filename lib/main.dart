@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:laptop_harbor/providers/cart_provider.dart';
+import 'package:laptop_harbor/providers/compare_provider.dart';
 import 'package:laptop_harbor/providers/laptop_provider.dart';
 import 'package:laptop_harbor/providers/theme_provider.dart';
 import 'package:laptop_harbor/providers/wishlist_provider.dart';
@@ -29,6 +30,8 @@ class LaptopHarborApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
          ChangeNotifierProvider(create: (_) => ThemeProvider()), 
          ChangeNotifierProvider(create: (_)=> LaptopProvider()),
+         
+        ChangeNotifierProvider(create: (_) => CompareProvider()),
      
                ],
     

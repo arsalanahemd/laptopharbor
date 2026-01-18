@@ -12,7 +12,7 @@ class HeroSection extends StatelessWidget {
         children: [
           _banner("assets/images/banner1.jpg"),
           _banner("assets/images/banner2.jpg"),
-          _banner("assets/images/banner3.jpg"),
+          _banner("assets/images/banner4.jpg"),
         ],
       ),
     );

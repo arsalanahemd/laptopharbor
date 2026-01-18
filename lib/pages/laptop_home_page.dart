@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:laptop_harbor/pages/orders_page.dart';
 import 'package:laptop_harbor/pages/profile_page.dart';
+import 'package:laptop_harbor/widgets/shop_by_brand.dart';
 import 'package:provider/provider.dart';
 import 'package:laptop_harbor/models/laptop_model.dart';
 import 'package:laptop_harbor/pages/CategoriesPage.dart';
@@ -507,7 +508,12 @@ class _LaptopHomePageState extends State<LaptopHomePage> with TickerProviderStat
         physics: const AlwaysScrollableScrollPhysics(),
         child: Column(
           children: [
+            const SizedBox(height: 15), 
             const HeroSection(),
+            ShopByBrandSection(),
+            // const SizedBox(height: 30), 
+            // const BrandFilterCard(brandName: "", itemCount:0 ,),
+          //  const BrandCard(brandName: '', logoUrl: '',),
             const SizedBox(height: 10),
             _section('🔥 Hot Deals', _hotDeals(), 0),
             _section('✨ New Arrivals', _newArrivals(), 1),
@@ -738,3 +744,4 @@ class _LaptopHomePageState extends State<LaptopHomePage> with TickerProviderStat
     super.dispose();
   }
 }
+// ignore_for_file: \\\\\\\\

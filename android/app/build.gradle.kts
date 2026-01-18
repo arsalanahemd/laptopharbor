@@ -16,8 +16,8 @@ android {
     ndkVersion = "27.0.12077973"
     
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17  // ✅ 11 se 17 karo
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8  // ✅ 11 se 17 karo
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {

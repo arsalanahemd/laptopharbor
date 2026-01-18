@@ -731,3 +731,4 @@ class _LaptopCardState extends State<LaptopCard> {
     }
   }
 }
+
